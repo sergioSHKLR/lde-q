@@ -1,0 +1,431 @@
+const MARKS_KEY = "lde-q-marks-v1";
+const PREF_KEY = "lde-q-pref-v1";
+
+const ui = {
+  "pt-BR": {
+    book: "O Livro dos Espíritos",
+    start: "Começar em Q.1",
+    jump: "Ir para uma questão…",
+    jumpPh: "22 ou 22a",
+    study: "questões · estudo",
+    theme: "Tema",
+    langOff: "EN quando o catálogo inglês existir",
+    spirit: "Espíritos",
+    kardec: "Kardec",
+    note: "Nota pessoal (fica no teu ficheiro)",
+    notePh: "Escreve uma nota só tua…",
+    fav: "Favoritas",
+    marks: "Destaques",
+    home: "Início",
+    q: "Questão",
+    all: "Todas",
+    emptyFav: "Ainda sem favoritas. Toca na estrela numa questão.",
+    emptyMarks: "Ainda sem destaques. Seleciona texto na resposta.",
+    comments: "Discussão pública entra aqui (Remark42 / Isso). Não é Hypothesis.",
+    shareFail: "Copia o endereço da questão para partilhar.",
+    export: "Exportar caderno",
+    import: "Importar caderno",
+    highlightHint: "Seleciona texto e toca em Destacar",
+    highlight: "Destacar",
+    bookCrumb: "Livro",
+    filter: "Filtrar…",
+  },
+  "en-US": {
+    book: "The Spirits’ Book",
+    start: "Start at Q.1",
+    jump: "Go to a question…",
+    jumpPh: "22 or 22a",
+    study: "questions · study",
+    theme: "Theme",
+    langOff: "EN when the English catalog exists",
+    spirit: "Spirits",
+    kardec: "Kardec",
+    note: "Personal note (stays in your file)",
+    notePh: "Write a note only you hold…",
+    fav: "Favorites",
+    marks: "Highlights",
+    home: "Home",
+    q: "Question",
+    all: "All",
+    emptyFav: "No favorites yet. Tap the star on a question.",
+    emptyMarks: "No highlights yet. Select text in an answer.",
+    comments: "Public discussion slots in here (Remark42 / Isso). Not Hypothesis.",
+    shareFail: "Copy the question URL to share.",
+    export: "Export notebook",
+    import: "Import notebook",
+    highlightHint: "Select text, then tap Highlight",
+    highlight: "Highlight",
+    bookCrumb: "Book",
+    filter: "Filter…",
+  },
+};
+
+const state = {
+  data: null,
+  byN: new Map(),
+  marks: loadMarks(),
+  pref: loadPref(),
+  sel: "",
+};
+
+function loadPref() {
+  try {
+    return { theme: "system", locale: "pt-BR", ...JSON.parse(localStorage.getItem(PREF_KEY) || "{}") };
+  } catch {
+    return { theme: "system", locale: "pt-BR" };
+  }
+}
+function savePref() {
+  localStorage.setItem(PREF_KEY, JSON.stringify(state.pref));
+  applyTheme();
+}
+function loadMarks() {
+  try {
+    const m = JSON.parse(localStorage.getItem(MARKS_KEY) || "{}");
+    return { v: 1, favs: [], highlights: {}, notes: {}, ...m };
+  } catch {
+    return { v: 1, favs: [], highlights: {}, notes: {} };
+  }
+}
+function saveMarks() {
+  localStorage.setItem(MARKS_KEY, JSON.stringify(state.marks));
+}
+function t(key) {
+  const loc = state.pref.locale === "en-US" ? "en-US" : "pt-BR";
+  return (ui[loc] && ui[loc][key]) || ui["pt-BR"][key] || key;
+}
+function applyTheme() {
+  const pref = state.pref.theme || "system";
+  const dark = pref === "dark" || (pref === "system" && matchMedia("(prefers-color-scheme: dark)").matches);
+  document.documentElement.dataset.theme = dark ? "dark" : "light";
+  document.documentElement.lang = state.pref.locale === "en-US" ? "en-US" : "pt-BR";
+}
+
+function parseHash() {
+  const raw = (location.hash || "#/").replace(/^#/, "");
+  const parts = raw.split("/").filter(Boolean);
+  if (!parts.length) return { name: "home" };
+  if (parts[0] === "q" && parts[1]) return { name: "q", n: normalizeN(parts[1]) };
+  if (parts[0] === "fav") return { name: "fav" };
+  if (parts[0] === "marks") return { name: "marks" };
+  if (parts[0] === "parte") return { name: "parte", parte: decodeURIComponent(parts.slice(1).join("/")) };
+  if (parts[0] === "cap") return { name: "cap", cap: decodeURIComponent(parts.slice(1).join("/")) };
+  return { name: "home" };
+}
+function go(path) {
+  location.hash = path.startsWith("#") ? path : `#${path}`;
+}
+function normalizeN(s) {
+  return String(s || "")
+    .toLowerCase()
+    .replace(/^q\.?/i, "")
+    .replace(/\./g, "");
+}
+
+function contentOf(q) {
+  // EN slot: when data.enReady and q.en exist, use it. Today always PT.
+  if (state.data?.enReady && state.pref.locale === "en-US" && q.en) return q.en;
+  return { prompt: q.prompt, spirit: q.spirit, kardec: q.kardec };
+}
+
+function iconStar(on) {
+  return on ? "★" : "☆";
+}
+
+function topBar(extra = "") {
+  const enOn = !!(state.data && state.data.enReady);
+  return `<header class="top">
+    <div class="grow">${extra}</div>
+    <div class="tools">
+      <button class="iconbtn" data-act="theme" title="${t("theme")}">${document.documentElement.dataset.theme === "dark" ? "☾" : "☼"}</button>
+      <button class="lang" data-act="lang" data-off="${enOn ? "0" : "1"}" ${enOn ? "" : "disabled"} title="${t("langOff")}">PT / EN</button>
+    </div>
+  </header>`;
+}
+
+function tabBar(active) {
+  return `<nav class="tabbar">
+    <button data-go="#/" class="${active === "home" ? "on" : ""}">${t("home")}</button>
+    <button data-go="#/q/${state.lastQ || "1"}" class="${active === "q" ? "on" : ""}">${t("q")}</button>
+    <button data-go="#/fav" class="${active === "fav" ? "on" : ""}">${t("fav")}</button>
+    <button data-go="#/marks" class="${active === "marks" ? "on" : ""}">${t("marks")}</button>
+  </nav>`;
+}
+
+function crumbsFor(q) {
+  const parte = encodeURIComponent(q.parte || "");
+  const cap = encodeURIComponent(q.cap || "");
+  return `<div class="crumbs">
+    <button class="pill" data-go="#/">${t("bookCrumb")}</button>
+    ${q.parte ? `<button class="pill" data-go="#/parte/${parte}">${esc(short(q.parte))}</button>` : ""}
+    ${q.cap ? `<button class="pill" data-go="#/cap/${cap}">${esc(short(q.cap))}</button>` : ""}
+  </div>`;
+}
+
+function short(s) {
+  return String(s).replace(/^\d+[.\d]*\s*/, "");
+}
+function esc(s) {
+  return String(s)
+    .replace(/&/g, "&")
+    .replace(/</g, "<")
+    .replace(/>/g, ">")
+    .replace(/"/g, """);
+}
+
+function paintHome() {
+  const n = state.data?.count || 0;
+  return `${topBar(`<strong>LDE</strong>`)}
+    <main class="home">
+      <div class="kicker">O LIVRO</div>
+      <h1>DOS ESPÍRITOS</h1>
+      <div>Allan Kardec</div>
+      <div class="rule"></div>
+      <p class="sub">${n.toLocaleString("pt-BR")} ${t("study")}</p>
+      <button class="primary" data-go="#/q/1">${t("start")}</button>
+      <button class="ghost" data-act="toggle-jump">${t("jump")}</button>
+      <input class="jump" id="jump" inputmode="text" placeholder="${t("jumpPh")}" />
+      <p class="sub" style="margin-top:2.2rem">
+        <button class="ghost" data-act="export">${t("export")}</button>
+        <label class="ghost"><input type="file" accept="application/json" hidden data-act="import" />${t("import")}</label>
+      </p>
+    </main>
+    ${tabBar("home")}`;
+}
+
+function applyHighlights(text, spans) {
+  if (!spans || !spans.length) return esc(text);
+  let out = esc(text);
+  for (const s of spans) {
+    const needle = esc(s.text || "");
+    if (!needle) continue;
+    out = out.replace(needle, `<mark class="mark">${needle}</mark>`);
+  }
+  return out;
+}
+
+function paintQ(n) {
+  const q = state.byN.get(n);
+  if (!q) return paintHome();
+  state.lastQ = n;
+  const c = contentOf(q);
+  const fav = state.marks.favs.includes(n);
+  const hs = state.marks.highlights[n] || [];
+  const note = state.marks.notes[n] || "";
+  const spirit = (c.spirit || []).map((p) => `<p>${applyHighlights(p, hs)}</p>`).join("");
+  const kardec = (c.kardec || []).map((p) => `<p>${applyHighlights(p, hs)}</p>`).join("");
+  return `${topBar(`${crumbsFor(q)}
+      <div class="tools" style="margin-top:.35rem">
+        <button class="iconbtn star ${fav ? "on" : ""}" data-act="fav">${iconStar(fav)}</button>
+        <button class="iconbtn" data-act="share" title="Share">↗</button>
+      </div>`)}
+    <main class="page">
+      <div class="qnum">${esc(q.label)}</div>
+      <h1 class="prompt">${esc(c.prompt || "")}</h1>
+      ${spirit ? `<section class="block"><h2>${t("spirit")}</h2>${spirit}</section>` : ""}
+      ${kardec ? `<section class="block"><h2>${t("kardec")}</h2>${kardec}</section>` : ""}
+      <p class="sub">${t("highlightHint")}</p>
+      <button class="chip" data-act="highlight">${t("highlight")}</button>
+      <label class="sub" style="display:block;margin-top:1rem">${t("note")}</label>
+      <textarea class="note" data-act="note" placeholder="${t("notePh")}">${esc(note)}</textarea>
+      <div class="qnav">
+        <button data-go="${q.prev ? `#/q/${q.prev}` : ""}" ${q.prev ? "" : "disabled"}>‹ ${q.prev ? "Q." + pretty(q.prev) : ""}</button>
+        <button data-go="${q.next ? `#/q/${q.next}` : ""}" ${q.next ? "" : "disabled"}>Q.${q.next ? pretty(q.next) : ""} ›</button>
+      </div>
+      <aside class="comments">${t("comments")}</aside>
+    </main>
+    ${tabBar("q")}`;
+}
+
+function pretty(n) {
+  const m = String(n).match(/^(\d+)([a-z]*)$/);
+  if (!m) return n;
+  return m[2] ? `${m[1]}.${m[2]}` : m[1];
+}
+
+function paintList(kind) {
+  const qAll = state.data.questions;
+  let rows = qAll;
+  let active = kind;
+  if (kind === "fav") rows = qAll.filter((q) => state.marks.favs.includes(q.n));
+  if (kind === "marks") rows = qAll.filter((q) => (state.marks.highlights[q.n] || []).length);
+  const title = kind === "fav" ? t("fav") : kind === "marks" ? t("marks") : t("all");
+  const empty = kind === "fav" ? t("emptyFav") : t("emptyMarks");
+  return `${topBar(`<strong>${esc(title)}</strong>`)}
+    <main class="page">
+      <input class="search" data-act="filter" placeholder="${t("filter")}" />
+      <div class="filters">
+        <button class="chip ${kind === "all" ? "on" : ""}" data-go="#/">${t("all")}</button>
+        <button class="chip ${kind === "fav" ? "on" : ""}" data-go="#/fav">${t("fav")}</button>
+        <button class="chip ${kind === "marks" ? "on" : ""}" data-go="#/marks">${t("marks")}</button>
+      </div>
+      <div class="list" data-list="${kind}">
+        ${rows.length ? rows.map(rowHTML).join("") : `<p class="empty">${empty}</p>`}
+      </div>
+    </main>
+    ${tabBar(active === "all" ? "home" : active)}`;
+}
+
+function rowHTML(q) {
+  const c = contentOf(q);
+  const excerpt = (state.marks.highlights[q.n] || []).map((h) => h.text).filter(Boolean)[0];
+  return `<button class="row" data-go="#/q/${q.n}">
+    <span class="n">${esc(pretty(q.n))}</span>
+    <span><strong>${esc(c.prompt || q.label)}</strong>
+      <small>${esc(short(q.parte || ""))} · ${esc(short(q.cap || ""))}</small>
+      ${excerpt ? `<small>“${esc(excerpt)}”</small>` : ""}
+    </span>
+    <span class="star ${state.marks.favs.includes(q.n) ? "on" : ""}">${state.marks.favs.includes(q.n) ? "★" : ""}</span>
+  </button>`;
+}
+
+function paintParte(name) {
+  const rows = state.data.questions.filter((q) => q.parte === name);
+  return `${topBar(`<div class="crumbs"><button class="pill" data-go="#/">${t("bookCrumb")}</button></div>`)}
+    <main class="page">
+      <h1>${esc(name)}</h1>
+      <div class="list">${rows.map(rowHTML).join("")}</div>
+    </main>
+    ${tabBar("home")}`;
+}
+function paintCap(name) {
+  const rows = state.data.questions.filter((q) => q.cap === name);
+  const parte = rows[0]?.parte;
+  return `${topBar(`<div class="crumbs">
+      <button class="pill" data-go="#/">${t("bookCrumb")}</button>
+      ${parte ? `<button class="pill" data-go="#/parte/${encodeURIComponent(parte)}">${esc(short(parte))}</button>` : ""}
+    </div>`)}
+    <main class="page">
+      <h1>${esc(name)}</h1>
+      <div class="list">${rows.map(rowHTML).join("")}</div>
+    </main>
+    ${tabBar("home")}`;
+}
+
+function render() {
+  applyTheme();
+  const r = parseHash();
+  const root = document.getElementById("app");
+  root.className = "app";
+  let html = "";
+  if (r.name === "q") html = paintQ(r.n);
+  else if (r.name === "fav") html = paintList("fav");
+  else if (r.name === "marks") html = paintList("marks");
+  else if (r.name === "parte") html = paintParte(r.parte);
+  else if (r.name === "cap") html = paintCap(r.cap);
+  else html = paintHome();
+  root.innerHTML = html;
+}
+
+function onClick(e) {
+  const goEl = e.target.closest("[data-go]");
+  if (goEl && goEl.dataset.go) {
+    e.preventDefault();
+    go(goEl.dataset.go);
+    return;
+  }
+  const act = e.target.closest("[data-act]");
+  if (!act) return;
+  const a = act.dataset.act;
+  if (a === "theme") {
+    const order = ["system", "light", "dark"];
+    const i = order.indexOf(state.pref.theme);
+    state.pref.theme = order[(i + 1) % order.length];
+    savePref();
+    render();
+  }
+  if (a === "lang") {
+    if (!state.data?.enReady) return;
+    state.pref.locale = state.pref.locale === "en-US" ? "pt-BR" : "en-US";
+    savePref();
+    render();
+  }
+  if (a === "toggle-jump") {
+    const el = document.getElementById("jump");
+    if (!el) return;
+    el.style.display = el.style.display === "block" ? "none" : "block";
+    el.focus();
+  }
+  if (a === "fav") {
+    const r = parseHash();
+    if (r.name !== "q") return;
+    const set = new Set(state.marks.favs);
+    if (set.has(r.n)) set.delete(r.n);
+    else set.add(r.n);
+    state.marks.favs = [...set];
+    saveMarks();
+    render();
+  }
+  if (a === "share") {
+    const url = location.href;
+    if (navigator.share) navigator.share({ title: document.title, url }).catch(() => {});
+    else navigator.clipboard.writeText(url).catch(() => alert(t("shareFail")));
+  }
+  if (a === "highlight") {
+    const r = parseHash();
+    const sel = (window.getSelection && String(window.getSelection())) || "";
+    const text = sel.trim();
+    if (!text || r.name !== "q") return;
+    const arr = state.marks.highlights[r.n] || [];
+    if (!arr.some((h) => h.text === text)) arr.push({ text });
+    state.marks.highlights[r.n] = arr;
+    saveMarks();
+    render();
+  }
+  if (a === "export") {
+    const blob = new Blob([JSON.stringify(state.marks, null, 2)], { type: "application/json" });
+    const aEl = document.createElement("a");
+    aEl.href = URL.createObjectURL(blob);
+    aEl.download = "lde-q-marks.json";
+    aEl.click();
+  }
+}
+
+function onChange(e) {
+  if (e.target.dataset.act === "import" && e.target.files?.[0]) {
+    const f = e.target.files[0];
+    f.text().then((txt) => {
+      const data = JSON.parse(txt);
+      state.marks = { v: 1, favs: [], highlights: {}, notes: {}, ...data };
+      saveMarks();
+      render();
+    });
+  }
+}
+
+function onInput(e) {
+  if (e.target.dataset.act === "note") {
+    const r = parseHash();
+    if (r.name !== "q") return;
+    state.marks.notes[r.n] = e.target.value;
+    saveMarks();
+  }
+  if (e.target.dataset.act === "filter") {
+    const q = e.target.value.toLowerCase().trim();
+    document.querySelectorAll("[data-list] .row").forEach((row) => {
+      row.style.display = !q || row.textContent.toLowerCase().includes(q) ? "" : "none";
+    });
+  }
+}
+
+function onKey(e) {
+  if (e.target.id === "jump" && e.key === "Enter") {
+    const n = normalizeN(e.target.value);
+    if (state.byN.has(n)) go(`#/q/${n}`);
+  }
+}
+
+async function boot() {
+  applyTheme();
+  const res = await fetch("data/questions.json");
+  state.data = await res.json();
+  for (const q of state.data.questions) state.byN.set(q.n, q);
+  document.getElementById("app").addEventListener("click", onClick);
+  document.getElementById("app").addEventListener("change", onChange);
+  document.getElementById("app").addEventListener("input", onInput);
+  document.getElementById("app").addEventListener("keydown", onKey);
+  window.addEventListener("hashchange", render);
+  render();
+}
+
+boot();
