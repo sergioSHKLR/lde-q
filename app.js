@@ -9,7 +9,7 @@ const ui = {
     jumpPh: "22 ou 22a",
     study: "questões · estudo",
     theme: "Tema",
-    langOff: "EN quando o catálogo inglês existir",
+    langOff: "EN-US quando o catálogo inglês existir",
     spirit: "Espíritos",
     kardec: "Kardec",
     note: "Nota pessoal (fica no teu ficheiro)",
@@ -37,7 +37,7 @@ const ui = {
     jumpPh: "22 or 22a",
     study: "questions · study",
     theme: "Theme",
-    langOff: "EN when the English catalog exists",
+    langOff: "EN-US when the English catalog exists",
     spirit: "Spirits",
     kardec: "Kardec",
     note: "Personal note (stays in your file)",
@@ -123,7 +123,7 @@ function normalizeN(s) {
 }
 
 function contentOf(q) {
-  // EN slot: when data.enReady and q.en exist, use it. Today always PT.
+  // EN-US slot: when data.enReady and q.en exist, use it. Today always PT-BR.
   if (state.data?.enReady && state.pref.locale === "en-US" && q.en) return q.en;
   return { prompt: q.prompt, spirit: q.spirit, kardec: q.kardec };
 }
@@ -138,7 +138,7 @@ function topBar(extra = "") {
     <div class="grow">${extra}</div>
     <div class="tools">
       <button class="iconbtn" data-act="theme" title="${t("theme")}">${document.documentElement.dataset.theme === "dark" ? "☾" : "☼"}</button>
-      <button class="lang" data-act="lang" data-off="${enOn ? "0" : "1"}" ${enOn ? "" : "disabled"} title="${t("langOff")}">PT / EN</button>
+      <button class="lang" data-act="lang" data-off="${enOn ? "0" : "1"}" ${enOn ? "" : "disabled"} title="${t("langOff")}">PT-BR / EN-US</button>
     </div>
   </header>`;
 }
