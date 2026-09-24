@@ -244,8 +244,6 @@ function paintHome() {
         <div class="index-actions">
           <button class="chip on" data-go="#/q/${last}">${resume ? t("resume") : t("start")} Q.${pretty(last)}</button>
           <button class="chip" data-act="toggle-jump">${t("jump")}</button>
-          <button class="chip" data-act="export">${t("export")}</button>
-          <label class="chip"><input type="file" accept="application/json" hidden data-act="import" />${t("import")}</label>
         </div>
         <input class="jump" id="jump" inputmode="text" placeholder="${t("jumpPh")}" />
       </div>
@@ -380,6 +378,10 @@ function paintList(kind) {
   return `${topBar(`<strong>${esc(title)}</strong>`)}
     <main class="page">
       <input class="search" data-act="filter" placeholder="${t("filter")}" />
+      <div class="index-actions">
+        <button class="chip" data-act="export">${t("export")}</button>
+        <label class="chip"><input type="file" accept="application/json" hidden data-act="import" />${t("import")}</label>
+      </div>
       <div class="list" data-list="${kind}">
         ${rows.length ? rows.map((q) => rowHTML(q, { starToggle: true })).join("") : `<p class="empty">${empty}</p>`}
       </div>
