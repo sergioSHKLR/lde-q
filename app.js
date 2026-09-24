@@ -227,34 +227,35 @@ function paintQ(n) {
   const note = state.marks.notes[n] || "";
   const spirit = (c.spirit || []).map((p) => `<p>${applyHighlights(p, hs)}</p>`).join("");
   const kardec = (c.kardec || []).map((p) => `<p>${applyHighlights(p, hs)}</p>`).join("");
-  return `${topBar(`${crumbsFor(q)}
-      <div class="tools" style="margin-top:.35rem">
-        <button class="iconbtn star ${fav ? "on" : ""}" data-act="fav">${iconStar(fav)}</button>
-        <button class="iconbtn" data-act="answers" title="${state.pref.showAnswers ? t("hideAnswers") : t("showAnswers")}">
-          <i data-icon="${state.pref.showAnswers ? "eye" : "eye-off"}"></i>
-        </button>
-        <button class="iconbtn" data-act="share" title="Share"><i data-icon="share-2"></i></button>
-      </div>`)}
+  const shown = !!state.pref.showAnswers;
+  return `${topBar(crumbsFor(q))}
     <main class="page">
-      <div class="qnum">${esc(q.label)}</div>
+      <div class="qhead">
+        <div class="qnum">${esc(q.label)}</div>
+        <div class="tools">
+          <button class="iconbtn star ${fav ? "on" : ""}" data-act="fav" title="${t("fav")}">${iconStar(fav)}</button>
+          <button class="iconbtn" data-act="answers" title="${shown ? t("hideAnswers") : t("showAnswers")}">
+            <i data-icon="${shown ? "eye" : "eye-off"}"></i>
+          </button>
+          <button class="iconbtn" data-act="share" title="Share"><i data-icon="share-2"></i></button>
+        </div>
+      </div>
       <h1 class="prompt">${esc(c.prompt || "")}</h1>
       ${
-        state.pref.showAnswers
+        shown
           ? `${spirit ? `<section class="block"><h2>${t("spirit")}</h2>${spirit}</section>` : ""}
       ${kardec ? `<section class="block"><h2>${t("kardec")}</h2>${kardec}</section>` : ""}
-      <p class="sub">${t("highlightHint")}</p>
+      <p class="hint">${t("highlightHint")}</p>
       <button class="chip" data-act="highlight"><i data-icon="highlighter"></i> ${t("highlight")}</button>`
-          : `<p class="sub">${t("answersHidden")}</p>
-      <button class="chip" data-act="answers"><i data-icon="eye"></i> ${t("showAnswers")}</button>`
+          : `<button class="chip ghost-chip" data-act="answers"><i data-icon="eye"></i> ${t("showAnswers")}</button>`
       }
-      <label class="sub" style="display:block;margin-top:1rem">${t("note")}</label>
-      <textarea class="note" data-act="note" placeholder="${t("notePh")}">${esc(note)}</textarea>
       <div class="qnav">
-        <button data-go="${q.prev ? `#/q/${q.prev}` : ""}" ${q.prev ? "" : "disabled"}><i data-icon="chevron-left"></i> ${q.prev ? "Q." + pretty(q.prev) : ""}</button>
+        <button data-go="${q.prev ? `#/q/${q.prev}` : ""}" ${q.prev ? "" : "disabled"}><i data-icon="chevron-left"></i>${q.prev ? " Q." + pretty(q.prev) : ""}</button>
         <button data-go="${q.next ? `#/q/${q.next}` : ""}" ${q.next ? "" : "disabled"}>Q.${q.next ? pretty(q.next) : ""} <i data-icon="chevron-right"></i></button>
       </div>
+      <label class="hint" for="note">${t("note")}</label>
+      <textarea class="note" id="note" data-act="note" placeholder="${t("notePh")}">${esc(note)}</textarea>
       <aside class="comments">
-        <div class="sub">${t("comments")}</div>
         <hyvor-talk-comments
           website-id="${HYVOR_WEBSITE_ID}"
           page-id="lde:${esc(n)}"
