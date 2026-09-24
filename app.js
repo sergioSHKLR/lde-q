@@ -166,11 +166,13 @@ function short(s) {
   return String(s).replace(/^\d+[.\d]*\s*/, "");
 }
 function esc(s) {
-  return String(s)
-    .replace(/&/g, "&")
-    .replace(/</g, "<")
-    .replace(/>/g, ">")
-    .replace(/"/g, """);
+  return String(s).replace(/[&<>"']/g, (ch) => {
+    if (ch === "&") return "&" + "amp;";
+    if (ch === "<") return "&" + "lt;";
+    if (ch === ">") return "&" + "gt;";
+    if (ch === '"') return "&" + "quot;";
+    return "&" + "#39;";
+  });
 }
 
 function paintHome() {
@@ -417,15 +419,23 @@ function onKey(e) {
 
 async function boot() {
   applyTheme();
-  const res = await fetch("data/questions.json");
-  state.data = await res.json();
-  for (const q of state.data.questions) state.byN.set(q.n, q);
-  document.getElementById("app").addEventListener("click", onClick);
-  document.getElementById("app").addEventListener("change", onChange);
-  document.getElementById("app").addEventListener("input", onInput);
-  document.getElementById("app").addEventListener("keydown", onKey);
-  window.addEventListener("hashchange", render);
-  render();
+  const root = document.getElementById("app");
+  root.className = "app";
+  root.innerHTML = "<main class='home'><p class='sub'>A carregar…</p></main>";
+  try {
+    const res = await fetch("data/questions.json");
+    if (!res.ok) throw new Error("catalog " + res.status);
+    state.data = await res.json();
+    for (const q of state.data.questions) state.byN.set(q.n, q);
+    root.addEventListener("click", onClick);
+    root.addEventListener("change", onChange);
+    root.addEventListener("input", onInput);
+    root.addEventListener("keydown", onKey);
+    window.addEventListener("hashchange", render);
+    render();
+  } catch (err) {
+    root.innerHTML = "<main class='home'><p>Falha a carregar o catálogo.</p><p class='sub'>" + String(err) + "</p></main>";
+  }
 }
 
 boot();
