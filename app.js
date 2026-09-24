@@ -1,3 +1,4 @@
+const HYVOR_WEBSITE_ID = "16128";
 const MARKS_KEY = "lde-q-marks-v1";
 const PREF_KEY = "lde-q-pref-v1";
 
@@ -21,7 +22,7 @@ const ui = {
     all: "Todas",
     emptyFav: "Ainda sem favoritas. Toca na estrela numa questão.",
     emptyMarks: "Ainda sem destaques. Seleciona texto na resposta.",
-    comments: "Discussão pública entra aqui (Remark42 / Isso). Não é Hypothesis.",
+    comments: "Discussão pública (Hyvor Talk)",
     shareFail: "Copia o endereço da questão para partilhar.",
     export: "Exportar caderno",
     import: "Importar caderno",
@@ -49,7 +50,7 @@ const ui = {
     all: "All",
     emptyFav: "No favorites yet. Tap the star on a question.",
     emptyMarks: "No highlights yet. Select text in an answer.",
-    comments: "Public discussion slots in here (Remark42 / Isso). Not Hypothesis.",
+    comments: "Public discussion (Hyvor Talk)",
     shareFail: "Copy the question URL to share.",
     export: "Export notebook",
     import: "Import notebook",
@@ -234,7 +235,15 @@ function paintQ(n) {
         <button data-go="${q.prev ? `#/q/${q.prev}` : ""}" ${q.prev ? "" : "disabled"}>‹ ${q.prev ? "Q." + pretty(q.prev) : ""}</button>
         <button data-go="${q.next ? `#/q/${q.next}` : ""}" ${q.next ? "" : "disabled"}>Q.${q.next ? pretty(q.next) : ""} ›</button>
       </div>
-      <aside class="comments">${t("comments")}</aside>
+      <aside class="comments">
+        <div class="sub">${t("comments")}</div>
+        <hyvor-talk-comments
+          website-id="${HYVOR_WEBSITE_ID}"
+          page-id="lde:${esc(n)}"
+          page-language="${state.pref.locale === "en-US" ? "en-US" : "pt-BR"}"
+          colors="${document.documentElement.dataset.theme === "dark" ? "dark" : "light"}"
+        ></hyvor-talk-comments>
+      </aside>
     </main>
     ${tabBar("q")}`;
 }
