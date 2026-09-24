@@ -277,11 +277,7 @@ function paintHome() {
   const last = state.lastQ && state.byN.has(state.lastQ) ? state.lastQ : "1";
   const resume = last !== "1";
   const groups = indexByParte();
-  return `${topBar(`<label class="search-wrap">
-      <i data-icon="search"></i>
-      <input class="search" data-act="search" value="${esc(state.qSearch)}" placeholder="${t("search")}" />
-    </label>`)}
-    <main class="page index">
+  return `<main class="page index">
       <div class="index-head">
         <div class="kicker"><i data-icon="sparkles" data-icon-size="16" class="brand"></i> ${t("book")}</div>
         <p class="tagline">${t("study")}</p>
@@ -290,6 +286,10 @@ function paintHome() {
           <button class="chip" data-act="toggle-jump">${t("jump")}</button>
         </div>
         <input class="jump" id="jump" inputmode="text" placeholder="${t("jumpPh")}" />
+        <label class="search-wrap">
+          <i data-icon="search"></i>
+          <input class="search" data-act="search" value="${esc(state.qSearch)}" placeholder="${t("search")}" />
+        </label>
       </div>
       ${
         (() => {
