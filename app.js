@@ -239,7 +239,7 @@ function paintHome() {
   return `${topBar(`<strong>LDE</strong>`)}
     <main class="page index">
       <div class="index-head">
-        <div class="kicker"><i data-icon="droplet" data-icon-size="16" class="brand"></i> ${t("book")}</div>
+        <div class="kicker"><i data-icon="sparkles" data-icon-size="16" class="brand"></i> ${t("book")}</div>
         <div class="index-actions">
           <button class="chip on" data-go="#/q/${last}">${resume ? t("resume") : t("start")} Q.${pretty(last)}</button>
           <button class="chip" data-act="toggle-jump">${t("jump")}</button>
