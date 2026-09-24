@@ -1,0 +1,41 @@
+{
+  "id": "/",
+  "name": "O Livro dos Espíritos",
+  "short_name": "LDE",
+  "description": "Estudo por questão — doutrina.org",
+  "start_url": "/",
+  "scope": "/",
+  "display_override": ["standalone", "minimal-ui"],
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#f4efe6",
+  "theme_color": "#3c78d8",
+  "lang": "pt-BR",
+  "categories": ["books", "education"],
+  "icons": [
+    {
+      "src": "pwa/doutrina-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "pwa/doutrina-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "pwa/doutrina-192-maskable.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "pwa/doutrina-512-maskable.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}

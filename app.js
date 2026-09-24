@@ -32,6 +32,9 @@ const ui = {
     highlight: "Destacar",
     bookCrumb: "Livro",
     filter: "Filtrar…",
+    showAnswers: "Mostrar respostas",
+    hideAnswers: "Ocultar respostas",
+    answersHidden: "Respostas ocultas — estuda a pergunta primeiro.",
   },
   "en-US": {
     book: "The Spirits’ Book",
@@ -60,6 +63,9 @@ const ui = {
     highlight: "Highlight",
     bookCrumb: "Book",
     filter: "Filter…",
+    showAnswers: "Show answers",
+    hideAnswers: "Hide answers",
+    answersHidden: "Answers hidden — sit with the question first.",
   },
 };
 
@@ -73,9 +79,9 @@ const state = {
 
 function loadPref() {
   try {
-    return { theme: "system", locale: "pt-BR", ...JSON.parse(localStorage.getItem(PREF_KEY) || "{}") };
+    return { theme: "system", locale: "pt-BR", showAnswers: false, ...JSON.parse(localStorage.getItem(PREF_KEY) || "{}") };
   } catch {
-    return { theme: "system", locale: "pt-BR" };
+    return { theme: "system", locale: "pt-BR", showAnswers: false };
   }
 }
 function savePref() {
@@ -222,15 +228,23 @@ function paintQ(n) {
   return `${topBar(`${crumbsFor(q)}
       <div class="tools" style="margin-top:.35rem">
         <button class="iconbtn star ${fav ? "on" : ""}" data-act="fav">${iconStar(fav)}</button>
+        <button class="iconbtn" data-act="answers" title="${state.pref.showAnswers ? t("hideAnswers") : t("showAnswers")}">
+          <i data-icon="${state.pref.showAnswers ? "eye" : "eye-off"}"></i>
+        </button>
         <button class="iconbtn" data-act="share" title="Share"><i data-icon="share-2"></i></button>
       </div>`)}
     <main class="page">
       <div class="qnum">${esc(q.label)}</div>
       <h1 class="prompt">${esc(c.prompt || "")}</h1>
-      ${spirit ? `<section class="block"><h2>${t("spirit")}</h2>${spirit}</section>` : ""}
+      ${
+        state.pref.showAnswers
+          ? `${spirit ? `<section class="block"><h2>${t("spirit")}</h2>${spirit}</section>` : ""}
       ${kardec ? `<section class="block"><h2>${t("kardec")}</h2>${kardec}</section>` : ""}
       <p class="sub">${t("highlightHint")}</p>
-      <button class="chip" data-act="highlight">${t("highlight")}</button>
+      <button class="chip" data-act="highlight"><i data-icon="highlighter"></i> ${t("highlight")}</button>`
+          : `<p class="sub">${t("answersHidden")}</p>
+      <button class="chip" data-act="answers"><i data-icon="eye"></i> ${t("showAnswers")}</button>`
+      }
       <label class="sub" style="display:block;margin-top:1rem">${t("note")}</label>
       <textarea class="note" data-act="note" placeholder="${t("notePh")}">${esc(note)}</textarea>
       <div class="qnav">
@@ -370,10 +384,19 @@ function onClick(e) {
     saveMarks();
     render();
   }
+  if (a === "answers") {
+    state.pref.showAnswers = !state.pref.showAnswers;
+    savePref();
+    render();
+  }
   if (a === "share") {
+    const r = parseHash();
+    const q = r.name === "q" ? state.byN.get(r.n) : null;
+    const c = q ? contentOf(q) : null;
     const url = location.href;
-    if (navigator.share) navigator.share({ title: document.title, url }).catch(() => {});
-    else navigator.clipboard.writeText(url).catch(() => alert(t("shareFail")));
+    const title = q ? `${q.label} — ${c.prompt}` : document.title;
+    if (navigator.share) navigator.share({ title, text: c ? c.prompt : title, url }).catch(() => {});
+    else navigator.clipboard.writeText(`${title}\n${url}`).catch(() => alert(t("shareFail")));
   }
   if (a === "highlight") {
     const r = parseHash();
@@ -445,6 +468,9 @@ async function boot() {
     root.addEventListener("keydown", onKey);
     window.addEventListener("hashchange", render);
     render();
+    if (location.protocol === "https:" && "serviceWorker" in navigator) {
+      navigator.serviceWorker.register("sw.js").catch(() => {});
+    }
   } catch (err) {
     root.innerHTML = "<main class='home'><p>Falha a carregar o catálogo.</p><p class='sub'>" + String(err) + "</p></main>";
   }
