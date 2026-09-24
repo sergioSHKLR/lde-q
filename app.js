@@ -7,8 +7,13 @@ const PREF_KEY = "lde-q-pref-v1";
 const ui = {
   "pt-BR": {
     book: "O Livro dos Espíritos",
-    start: "Começar em Q.1",
-    jump: "Ir para uma questão…",
+    start: "Começar",
+    resume: "Continuar",
+    jump: "Saltar…",
+    emptyFav: "Ainda sem favoritas. Toca na estrela.",
+    emptyMarks: "Ainda sem destaques nem notas.",
+    qs: "questões",
+    sections: "secções",
     jumpPh: "22 ou 22a",
     study: "questões · estudo",
     theme: "Tema",
@@ -22,8 +27,8 @@ const ui = {
     home: "Início",
     q: "Questão",
     all: "Todas",
-    emptyFav: "Ainda sem favoritas. Toca na estrela numa questão.",
-    emptyMarks: "Ainda sem destaques. Seleciona texto na resposta.",
+    emptyFav: "Ainda sem favoritas. Toca na estrela.",
+    emptyMarks: "Ainda sem destaques nem notas.",
     comments: "Discussão pública (Hyvor Talk)",
     shareFail: "Copia o endereço da questão para partilhar.",
     copied: "Ligação copiada",
@@ -39,8 +44,13 @@ const ui = {
   },
   "en-US": {
     book: "The Spirits’ Book",
-    start: "Start at Q.1",
-    jump: "Go to a question…",
+    start: "Start",
+    resume: "Continue",
+    jump: "Jump…",
+    emptyFav: "No favorites yet. Tap the star.",
+    emptyMarks: "No highlights or notes yet.",
+    qs: "questions",
+    sections: "sections",
     jumpPh: "22 or 22a",
     study: "questions · study",
     theme: "Theme",
@@ -54,8 +64,8 @@ const ui = {
     home: "Home",
     q: "Question",
     all: "All",
-    emptyFav: "No favorites yet. Tap the star on a question.",
-    emptyMarks: "No highlights yet. Select text in an answer.",
+    emptyFav: "No favorites yet. Tap the star.",
+    emptyMarks: "No highlights or notes yet.",
     comments: "Public discussion (Hyvor Talk)",
     shareFail: "Copy the question URL to share.",
     copied: "Link copied",
@@ -187,22 +197,76 @@ function esc(s) {
   });
 }
 
+function capBits(cap) {
+  const raw = String(cap || "");
+  const m = raw.match(/^(\d+\.\d+)\.\s*(.*)$/) || raw.match(/^(\d+)\.\s*(.*)$/);
+  return { num: m ? m[1] : "", title: short(raw) };
+}
+
+function indexByParte() {
+  const parteOrder = [];
+  const byParte = new Map();
+  for (const q of state.data.questions) {
+    const parte = q.parte || "";
+    if (!byParte.has(parte)) {
+      byParte.set(parte, { parte, caps: new Map() });
+      parteOrder.push(parte);
+    }
+    const g = byParte.get(parte);
+    if (!g.caps.has(q.cap)) {
+      g.caps.set(q.cap, { cap: q.cap, count: 0, secs: new Set() });
+    }
+    const c = g.caps.get(q.cap);
+    c.count += 1;
+    if (q.sec) c.secs.add(q.sec);
+  }
+  return parteOrder.map((parte) => {
+    const g = byParte.get(parte);
+    return {
+      parte,
+      caps: [...g.caps.values()].map((c) => {
+        const bits = capBits(c.cap);
+        return { cap: c.cap, num: bits.num, title: bits.title, count: c.count, secCount: c.secs.size || 1 };
+      }),
+    };
+  });
+}
+
 function paintHome() {
-  const n = state.data?.count || 0;
+  const last = state.lastQ && state.byN.has(state.lastQ) ? state.lastQ : "1";
+  const resume = last !== "1";
+  const groups = indexByParte();
   return `${topBar(`<strong>LDE</strong>`)}
-    <main class="home">
-      <div class="kicker"><i data-icon="droplet" data-icon-size="18" class="brand"></i> O LIVRO</div>
-      <h1>DOS ESPÍRITOS</h1>
-      <div>Allan Kardec</div>
-      <div class="rule"></div>
-      <p class="sub">${n.toLocaleString("pt-BR")} ${t("study")}</p>
-      <button class="primary" data-go="#/q/1">${t("start")}</button>
-      <button class="ghost" data-act="toggle-jump">${t("jump")}</button>
-      <input class="jump" id="jump" inputmode="text" placeholder="${t("jumpPh")}" />
-      <p class="sub" style="margin-top:2.2rem">
-        <button class="ghost" data-act="export">${t("export")}</button>
-        <label class="ghost"><input type="file" accept="application/json" hidden data-act="import" />${t("import")}</label>
-      </p>
+    <main class="page index">
+      <div class="index-head">
+        <div class="kicker"><i data-icon="droplet" data-icon-size="16" class="brand"></i> ${t("book")}</div>
+        <div class="index-actions">
+          <button class="chip on" data-go="#/q/${last}">${resume ? t("resume") : t("start")} Q.${pretty(last)}</button>
+          <button class="chip" data-act="toggle-jump">${t("jump")}</button>
+          <button class="chip" data-act="export">${t("export")}</button>
+          <label class="chip"><input type="file" accept="application/json" hidden data-act="import" />${t("import")}</label>
+        </div>
+        <input class="jump" id="jump" inputmode="text" placeholder="${t("jumpPh")}" />
+      </div>
+      ${groups
+        .map(
+          (g) => `<section class="index-parte">
+        <h2>${esc(short(g.parte))}</h2>
+        <div class="list">
+          ${g.caps
+            .map(
+              (c) => `<button class="row" data-go="#/cap/${encodeURIComponent(c.cap)}">
+            <span class="n">${esc(c.num)}</span>
+            <span><strong>${esc(c.title)}</strong>
+              <small>${c.secCount} ${t("sections")} · ${c.count} ${t("qs")}</small>
+            </span>
+          </button>`
+            )
+            .join("")}
+        </div>
+      </section>`
+        )
+        .join("")}
     </main>
     ${tabBar("home")}`;
 }
@@ -248,7 +312,7 @@ function paintQ(n) {
       ${kardec ? `<section class="block"><h2>${t("kardec")}</h2>${kardec}</section>` : ""}
       <p class="hint">${t("highlightHint")}</p>
       <button class="chip" data-act="highlight"><i data-icon="highlighter"></i> ${t("highlight")}</button>`
-          : `<button class="chip ghost-chip" data-act="answers"><i data-icon="eye"></i> ${t("showAnswers")}</button>`
+          : ``
       }
       <div class="qnav">
         <button data-go="${q.prev ? `#/q/${q.prev}` : ""}" ${q.prev ? "" : "disabled"}><i data-icon="chevron-left"></i>${q.prev ? " Q." + pretty(q.prev) : ""}</button>
@@ -306,37 +370,43 @@ function pretty(n) {
 function paintList(kind) {
   const qAll = state.data.questions;
   let rows = qAll;
-  let active = kind;
   if (kind === "fav") rows = qAll.filter((q) => state.marks.favs.includes(q.n));
-  if (kind === "marks") rows = qAll.filter((q) => (state.marks.highlights[q.n] || []).length);
-  const title = kind === "fav" ? t("fav") : kind === "marks" ? t("marks") : t("all");
+  if (kind === "marks") {
+    rows = qAll.filter((q) => (state.marks.highlights[q.n] || []).length || String(state.marks.notes[q.n] || "").trim());
+  }
+  const title = kind === "fav" ? t("fav") : t("marks");
   const empty = kind === "fav" ? t("emptyFav") : t("emptyMarks");
   return `${topBar(`<strong>${esc(title)}</strong>`)}
     <main class="page">
       <input class="search" data-act="filter" placeholder="${t("filter")}" />
-      <div class="filters">
-        <button class="chip ${kind === "all" ? "on" : ""}" data-go="#/">${t("all")}</button>
-        <button class="chip ${kind === "fav" ? "on" : ""}" data-go="#/fav">${t("fav")}</button>
-        <button class="chip ${kind === "marks" ? "on" : ""}" data-go="#/marks">${t("marks")}</button>
-      </div>
       <div class="list" data-list="${kind}">
-        ${rows.length ? rows.map(rowHTML).join("") : `<p class="empty">${empty}</p>`}
+        ${rows.length ? rows.map((q) => rowHTML(q, { starToggle: true })).join("") : `<p class="empty">${empty}</p>`}
       </div>
     </main>
-    ${tabBar(active === "all" ? "home" : active)}`;
+    ${tabBar(kind)}`;
 }
 
-function rowHTML(q) {
+function rowHTML(q, opts = {}) {
   const c = contentOf(q);
-  const excerpt = (state.marks.highlights[q.n] || []).map((h) => h.text).filter(Boolean)[0];
-  return `<button class="row" data-go="#/q/${q.n}">
-    <span class="n">${esc(pretty(q.n))}</span>
-    <span><strong>${esc(c.prompt || q.label)}</strong>
-      <small>${esc(short(q.parte || ""))} · ${esc(short(q.cap || ""))}</small>
-      ${excerpt ? `<small>“${esc(excerpt)}”</small>` : ""}
-    </span>
-    <span class="star ${state.marks.favs.includes(q.n) ? "on" : ""}">${state.marks.favs.includes(q.n) ? '<i data-icon="star" class="filled"></i>' : ""}</span>
-  </button>`;
+  const excerpt =
+    (state.marks.highlights[q.n] || []).map((h) => h.text).filter(Boolean)[0] ||
+    String(state.marks.notes[q.n] || "").trim();
+  const fav = state.marks.favs.includes(q.n);
+  const star = opts.starToggle
+    ? `<button class="iconbtn star ${fav ? "on" : ""}" data-act="fav-toggle" data-n="${esc(q.n)}">${iconStar(fav)}</button>`
+    : fav
+      ? `<span class="star on">${iconStar(true)}</span>`
+      : `<span></span>`;
+  return `<div class="row">
+    <button class="row-main" data-go="#/q/${q.n}">
+      <span class="n">${esc(pretty(q.n))}</span>
+      <span><strong>${esc(c.prompt || q.label)}</strong>
+        <small>${esc(short(q.cap || ""))}${q.sec ? " · " + esc(short(q.sec)) : ""}</small>
+        ${excerpt ? `<small>“${esc(excerpt)}”</small>` : ""}
+      </span>
+    </button>
+    ${star}
+  </div>`;
 }
 
 function paintParte(name) {
@@ -350,14 +420,35 @@ function paintParte(name) {
 }
 function paintCap(name) {
   const rows = state.data.questions.filter((q) => q.cap === name);
-  const parte = rows[0]?.parte;
+  const order = [];
+  const counts = new Map();
+  for (const q of rows) {
+    const key = q.sec || q.cap;
+    if (!counts.has(key)) {
+      counts.set(key, { sec: q.sec, title: short(q.sec || q.cap), count: 0 });
+      order.push(key);
+    }
+    counts.get(key).count += 1;
+  }
   return `${topBar(`<nav class="crumbs">
       <button class="pill" data-go="#/">${t("bookCrumb")}</button>
       <button class="pill">${esc(short(name))}</button>
     </nav>`)}
     <main class="page">
-      <h1>${esc(name)}</h1>
-      <div class="list">${rows.map(rowHTML).join("")}</div>
+      <h1 class="prompt">${esc(short(name))}</h1>
+      <div class="list">
+        ${order
+          .map((key) => {
+            const s = counts.get(key);
+            const href = s.sec ? `#/sec/${encodeURIComponent(s.sec)}` : `#/q/${rows[0].n}`;
+            return `<button class="row" data-go="${href}">
+          <span><strong>${esc(s.title)}</strong>
+            <small>${s.count} ${t("qs")}</small>
+          </span>
+        </button>`;
+          })
+          .join("")}
+      </div>
     </main>
     ${tabBar("home")}`;
 }
@@ -412,7 +503,24 @@ function render() {
   if (r.name === "q") mountTalk(r.n);
 }
 
+function toggleFav(n) {
+  if (!n) return;
+  const set = new Set(state.marks.favs);
+  if (set.has(n)) set.delete(n);
+  else set.add(n);
+  state.marks.favs = [...set];
+  saveMarks();
+  render();
+}
+
 function onClick(e) {
+  const actEl = e.target.closest("[data-act]");
+  if (actEl && actEl.dataset.act === "fav-toggle") {
+    e.preventDefault();
+    e.stopPropagation();
+    toggleFav(actEl.dataset.n);
+    return;
+  }
   const goEl = e.target.closest("[data-go]");
   if (goEl && goEl.dataset.go) {
     e.preventDefault();
@@ -444,12 +552,7 @@ function onClick(e) {
   if (a === "fav") {
     const r = parseHash();
     if (r.name !== "q") return;
-    const set = new Set(state.marks.favs);
-    if (set.has(r.n)) set.delete(r.n);
-    else set.add(r.n);
-    state.marks.favs = [...set];
-    saveMarks();
-    render();
+    toggleFav(r.n);
   }
   if (a === "answers") {
     state.pref.showAnswers = !state.pref.showAnswers;
