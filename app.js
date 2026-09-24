@@ -26,6 +26,7 @@ const ui = {
     emptyMarks: "Ainda sem destaques. Seleciona texto na resposta.",
     comments: "Discussão pública (Hyvor Talk)",
     shareFail: "Copia o endereço da questão para partilhar.",
+    copied: "Ligação copiada",
     export: "Exportar caderno",
     import: "Importar caderno",
     highlightHint: "Seleciona texto e toca em Destacar",
@@ -57,6 +58,7 @@ const ui = {
     emptyMarks: "No highlights yet. Select text in an answer.",
     comments: "Public discussion (Hyvor Talk)",
     shareFail: "Copy the question URL to share.",
+    copied: "Link copied",
     export: "Export notebook",
     import: "Import notebook",
     highlightHint: "Select text, then tap Highlight",
@@ -264,6 +266,42 @@ function paintQ(n) {
     ${tabBar("q")}`;
 }
 
+function shareUrl(n) {
+  return `https://lde.doutrina.org/${n ? `#/q/${n}` : ""}`;
+}
+
+function toast(msg) {
+  document.querySelectorAll(".toast").forEach((el) => el.remove());
+  const el = document.createElement("div");
+  el.className = "toast";
+  el.textContent = msg;
+  document.body.appendChild(el);
+  setTimeout(() => el.remove(), 2200);
+}
+
+async function shareQuestion() {
+  const r = parseHash();
+  const q = r.name === "q" ? state.byN.get(r.n) : null;
+  const c = q ? contentOf(q) : null;
+  const url = q ? shareUrl(q.n) : shareUrl();
+  const title = q ? `${q.label} — ${c.prompt || ""}` : document.title;
+  const text = c?.prompt ? `${title}\n${url}` : url;
+  try {
+    if (navigator.share) {
+      await navigator.share({ title, text: c?.prompt || title, url });
+      return;
+    }
+  } catch (err) {
+    if (err && err.name === "AbortError") return;
+  }
+  try {
+    await navigator.clipboard.writeText(text);
+    toast(t("copied"));
+  } catch {
+    window.prompt(t("shareFail"), url);
+  }
+}
+
 function pretty(n) {
   const m = String(n).match(/^(\d+)([a-z]*)$/);
   if (!m) return n;
@@ -390,13 +428,8 @@ function onClick(e) {
     render();
   }
   if (a === "share") {
-    const r = parseHash();
-    const q = r.name === "q" ? state.byN.get(r.n) : null;
-    const c = q ? contentOf(q) : null;
-    const url = location.href;
-    const title = q ? `${q.label} — ${c.prompt}` : document.title;
-    if (navigator.share) navigator.share({ title, text: c ? c.prompt : title, url }).catch(() => {});
-    else navigator.clipboard.writeText(`${title}\n${url}`).catch(() => alert(t("shareFail")));
+    shareQuestion();
+    return;
   }
   if (a === "highlight") {
     const r = parseHash();
