@@ -237,6 +237,8 @@ function searchQuestions(raw) {
   }
   return out;
 }
+
+function capBits(cap) {
   const raw = String(cap || "");
   const m = raw.match(/^(\d+\.\d+)\.\s*(.*)$/) || raw.match(/^(\d+)\.\s*(.*)$/);
   return { num: m ? m[1] : "", title: short(raw) };
