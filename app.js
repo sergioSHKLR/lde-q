@@ -22,13 +22,16 @@ const ui = {
     kardec: "Kardec",
     note: "Nota pessoal (fica no teu ficheiro)",
     notePh: "Escreve uma nota só tua…",
+    notebook: "Caderno",
     fav: "Favoritas",
+    allMarks: "Tudo",
     marks: "Destaques",
     home: "Início",
     q: "Questão",
-    all: "Todas",
+    allMarks: "Tudo",
     emptyFav: "Ainda sem favoritas. Toca na estrela.",
     emptyMarks: "Ainda sem destaques nem notas.",
+    emptyAll: "O caderno está vazio.",
     comments: "Discussão pública (Hyvor Talk)",
     shareFail: "Copia o endereço da questão para partilhar.",
     copied: "Ligação copiada",
@@ -59,13 +62,16 @@ const ui = {
     kardec: "Kardec",
     note: "Personal note (stays in your file)",
     notePh: "Write a note only you hold…",
+    notebook: "Notebook",
     fav: "Favorites",
+    allMarks: "All",
     marks: "Highlights",
     home: "Home",
     q: "Question",
-    all: "All",
+    allMarks: "All",
     emptyFav: "No favorites yet. Tap the star.",
     emptyMarks: "No highlights or notes yet.",
+    emptyAll: "The notebook is empty.",
     comments: "Public discussion (Hyvor Talk)",
     shareFail: "Copy the question URL to share.",
     copied: "Link copied",
@@ -127,8 +133,9 @@ function parseHash() {
   const parts = raw.split("/").filter(Boolean);
   if (!parts.length) return { name: "home" };
   if (parts[0] === "q" && parts[1]) return { name: "q", n: normalizeN(parts[1]) };
-  if (parts[0] === "fav") return { name: "fav" };
-  if (parts[0] === "marks") return { name: "marks" };
+  if (parts[0] === "caderno") return { name: "caderno", filter: parts[1] === "fav" || parts[1] === "marks" ? parts[1] : "all" };
+  if (parts[0] === "fav") return { name: "caderno", filter: "fav" };
+  if (parts[0] === "marks") return { name: "caderno", filter: "marks" };
   if (parts[0] === "parte") return { name: "parte", parte: decodeURIComponent(parts.slice(1).join("/")) };
   if (parts[0] === "cap") return { name: "cap", cap: decodeURIComponent(parts.slice(1).join("/")) };
   if (parts[0] === "sec") return { name: "sec", sec: decodeURIComponent(parts.slice(1).join("/")) };
@@ -169,8 +176,7 @@ function tabBar(active) {
   return `<nav class="tabbar">
     <button data-go="#/" class="${active === "home" ? "on" : ""}"><i data-icon="house"></i><span>${t("home")}</span></button>
     <button data-go="#/q/${state.lastQ || "1"}" class="${active === "q" ? "on" : ""}"><i data-icon="book"></i><span>${t("q")}</span></button>
-    <button data-go="#/fav" class="${active === "fav" ? "on" : ""}"><i data-icon="star"></i><span>${t("fav")}</span></button>
-    <button data-go="#/marks" class="${active === "marks" ? "on" : ""}"><i data-icon="highlighter"></i><span>${t("marks")}</span></button>
+    <button data-go="#/caderno" class="${active === "caderno" ? "on" : ""}"><i data-icon="sticky-note"></i><span>${t("notebook")}</span></button>
   </nav>`;
 }
 
@@ -366,27 +372,31 @@ function pretty(n) {
   return m[2] ? `${m[1]}.${m[2]}` : m[1];
 }
 
-function paintList(kind) {
+function paintList(filter) {
   const qAll = state.data.questions;
-  let rows = qAll;
-  if (kind === "fav") rows = qAll.filter((q) => state.marks.favs.includes(q.n));
-  if (kind === "marks") {
-    rows = qAll.filter((q) => (state.marks.highlights[q.n] || []).length || String(state.marks.notes[q.n] || "").trim());
-  }
-  const title = kind === "fav" ? t("fav") : t("marks");
-  const empty = kind === "fav" ? t("emptyFav") : t("emptyMarks");
-  return `${topBar(`<strong>${esc(title)}</strong>`)}
+  const isFav = (q) => state.marks.favs.includes(q.n);
+  const isMark = (q) => (state.marks.highlights[q.n] || []).length || String(state.marks.notes[q.n] || "").trim();
+  let rows = qAll.filter((q) => isFav(q) || isMark(q));
+  if (filter === "fav") rows = qAll.filter(isFav);
+  if (filter === "marks") rows = qAll.filter(isMark);
+  const empty = filter === "fav" ? t("emptyFav") : filter === "marks" ? t("emptyMarks") : t("emptyAll");
+  return `${topBar(`<strong>${esc(t("notebook"))}</strong>`)}
     <main class="page">
+      <div class="filters">
+        <button class="chip ${filter === "all" ? "on" : ""}" data-go="#/caderno">${t("allMarks")}</button>
+        <button class="chip ${filter === "fav" ? "on" : ""}" data-go="#/caderno/fav">${t("fav")}</button>
+        <button class="chip ${filter === "marks" ? "on" : ""}" data-go="#/caderno/marks">${t("marks")}</button>
+      </div>
       <input class="search" data-act="filter" placeholder="${t("filter")}" />
       <div class="index-actions">
         <button class="chip" data-act="export">${t("export")}</button>
         <label class="chip"><input type="file" accept="application/json" hidden data-act="import" />${t("import")}</label>
       </div>
-      <div class="list" data-list="${kind}">
+      <div class="list" data-list="caderno">
         ${rows.length ? rows.map((q) => rowHTML(q, { starToggle: true })).join("") : `<p class="empty">${empty}</p>`}
       </div>
     </main>
-    ${tabBar(kind)}`;
+    ${tabBar("caderno")}`;
 }
 
 function rowHTML(q, opts = {}) {
@@ -495,8 +505,7 @@ function render() {
   destroyTalk();
   let html = "";
   if (r.name === "q") html = paintQ(r.n);
-  else if (r.name === "fav") html = paintList("fav");
-  else if (r.name === "marks") html = paintList("marks");
+  else if (r.name === "caderno") html = paintList(r.filter || "all");
   else if (r.name === "parte") html = paintParte(r.parte);
   else if (r.name === "cap") html = paintCap(r.cap);
   else if (r.name === "sec") html = paintSec(r.sec);
