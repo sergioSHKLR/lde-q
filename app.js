@@ -168,13 +168,10 @@ function iconStar(on) {
 }
 
 function topBar(extra = "") {
-  const enOn = !!(state.data && state.data.enReady);
+  const onHome = parseHash().name === "home";
   return `<header class="top">
     <div class="grow">${extra}</div>
-    <div class="tools">
-      <button class="iconbtn" data-act="theme" title="${t("theme")}"><i data-icon="${document.documentElement.dataset.theme === "dark" ? "moon" : "sun"}"></i></button>
-      <button class="lang" data-act="lang" data-off="${enOn ? "0" : "1"}" ${enOn ? "" : "disabled"} title="${t("langOff")}"><i data-icon="lang-pt" data-icon-size="16"></i><span>/</span><i data-icon="lang-en" data-icon-size="16"></i></button>
-    </div>
+    ${onHome ? "" : `<button class="iconbtn" data-act="open-search" title="${t("search")}"><i data-icon="search"></i></button>`}
   </header>`;
 }
 
@@ -278,7 +275,10 @@ function paintHome() {
   const last = state.lastQ && state.byN.has(state.lastQ) ? state.lastQ : "1";
   const resume = last !== "1";
   const groups = indexByParte();
-  return `${topBar(`<strong>LDE</strong>`)}
+  return `${topBar(`<label class="search-wrap">
+      <i data-icon="search"></i>
+      <input class="search" data-act="search" value="${esc(state.qSearch)}" placeholder="${t("search")}" />
+    </label>`)}
     <main class="page index">
       <div class="index-head">
         <div class="kicker"><i data-icon="sparkles" data-icon-size="16" class="brand"></i> ${t("book")}</div>
@@ -288,10 +288,6 @@ function paintHome() {
           <button class="chip" data-act="toggle-jump">${t("jump")}</button>
         </div>
         <input class="jump" id="jump" inputmode="text" placeholder="${t("jumpPh")}" />
-        <label class="search-wrap">
-          <i data-icon="search"></i>
-          <input class="search" data-act="search" value="${esc(state.qSearch)}" placeholder="${t("search")}" />
-        </label>
       </div>
       ${
         (() => {
@@ -443,6 +439,8 @@ function paintList(filter) {
       <div class="index-actions">
         <button class="chip" data-act="export">${t("export")}</button>
         <label class="chip"><input type="file" accept="application/json" hidden data-act="import" />${t("import")}</label>
+        <button class="iconbtn" data-act="theme" title="${t("theme")}"><i data-icon="${document.documentElement.dataset.theme === "dark" ? "moon" : "sun"}"></i></button>
+        <button class="lang" data-act="lang" data-off="${state.data?.enReady ? "0" : "1"}" ${state.data?.enReady ? "" : "disabled"} title="${t("langOff")}"><i data-icon="lang-pt" data-icon-size="16"></i><span>/</span><i data-icon="lang-en" data-icon-size="16"></i></button>
       </div>
       <div class="list" data-list="caderno">
         ${rows.length ? rows.map((q) => rowHTML(q, { starToggle: true })).join("") : `<p class="empty">${empty}</p>`}
@@ -565,6 +563,11 @@ function render() {
   root.innerHTML = html;
   hydrateIcons(root);
   if (r.name === "q") mountTalk(r.n);
+  if (r.name === "home" && state.focusSearch) {
+    state.focusSearch = false;
+    const el = document.querySelector("[data-act=search]");
+    if (el) el.focus();
+  }
 }
 
 function toggleFav(n) {
@@ -606,6 +609,11 @@ function onClick(e) {
     state.pref.locale = state.pref.locale === "en-US" ? "pt-BR" : "en-US";
     savePref();
     render();
+  }
+  if (a === "open-search") {
+    state.focusSearch = true;
+    go("#/");
+    return;
   }
   if (a === "toggle-jump") {
     const el = document.getElementById("jump");
