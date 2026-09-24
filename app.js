@@ -180,7 +180,7 @@ function topBar(extra = "") {
 
 function tabBar(active) {
   return `<nav class="tabbar">
-    <button data-go="#/" class="${active === "home" ? "on" : ""}"><i data-icon="house"></i><span>${t("home")}</span></button>
+    <button data-go="#/" class="${active === "home" ? "on" : ""}"><i data-icon="sparkles"></i><span>${t("home")}</span></button>
     <button data-go="#/q/${state.lastQ || "1"}" class="${active === "q" ? "on" : ""}"><i data-icon="book"></i><span>${t("q")}</span></button>
     <button data-go="#/caderno" class="${active === "caderno" ? "on" : ""}"><i data-icon="sticky-note"></i><span>${t("notebook")}</span></button>
   </nav>`;

@@ -4,8 +4,8 @@
   --muted: #6b6258;
   --line: #ddd4c6;
   --card: #fbf7f0;
-  --accent: #3c78d8;
-  --star: #3c78d8;
+  --accent: #c17f3e;
+  --star: #c17f3e;
   --mark: #f3e08a;
   --safe-b: 5.5rem;
   --sans: "Quicksand", system-ui, "Segoe UI", sans-serif;
@@ -17,8 +17,8 @@ html[data-theme="dark"] {
   --muted: #b3a99b;
   --line: #3a342c;
   --card: #24211c;
-  --accent: #6d9eef;
-  --star: #6d9eef;
+  --accent: #d4a06a;
+  --star: #d4a06a;
   --mark: #6b5a1e;
 }
 * { box-sizing: border-box; }
@@ -313,7 +313,7 @@ button.row {
   gap: .15rem;
 }
 .tabbar button.on { color: #fff; }
-.tabbar button.on [data-icon] svg { stroke: #3c78d8; }
+.tabbar button.on [data-icon] svg { stroke: var(--accent); }
 .tabbar [data-icon] svg {
   width: 1.35rem;
   height: 1.35rem;
