@@ -41,6 +41,9 @@ const ui = {
     highlight: "Destacar",
     bookCrumb: "Livro",
     filter: "Filtrar…",
+    search: "Buscar questões…",
+    searchEmpty: "Nada encontrado.",
+    searchHits: "questões",
     showAnswers: "Mostrar respostas",
     hideAnswers: "Ocultar respostas",
     answersHidden: "Respostas ocultas — estuda a pergunta primeiro.",
@@ -81,6 +84,9 @@ const ui = {
     highlight: "Highlight",
     bookCrumb: "Book",
     filter: "Filter…",
+    search: "Search questions…",
+    searchEmpty: "Nothing found.",
+    searchHits: "questions",
     showAnswers: "Show answers",
     hideAnswers: "Hide answers",
     answersHidden: "Answers hidden — sit with the question first.",
@@ -92,7 +98,7 @@ const state = {
   byN: new Map(),
   marks: loadMarks(),
   pref: loadPref(),
-  sel: "",
+  qSearch: "",
 };
 
 function loadPref() {
@@ -203,7 +209,37 @@ function esc(s) {
   });
 }
 
-function capBits(cap) {
+function fold(s) {
+  return String(s || "")
+    .normalize("NFD")
+    .replace(/\p{M}/gu, "")
+    .toLowerCase();
+}
+
+function haystack(q) {
+  const c = contentOf(q);
+  return fold(
+    [q.n, q.label, c.prompt, q.parte, q.cap, q.sec, ...(c.spirit || []), ...(c.kardec || [])].join(" ")
+  );
+}
+
+function searchQuestions(raw) {
+  const qstr = fold(raw).trim();
+  if (!qstr) return [];
+  const tokens = qstr.split(/\s+/).filter(Boolean);
+  const exact = normalizeN(raw);
+  const out = [];
+  for (const q of state.data.questions) {
+    if (q.n === exact) {
+      out.unshift(q);
+      continue;
+    }
+    const hay = haystack(q);
+    if (tokens.every((tok) => hay.includes(tok))) out.push(q);
+    if (out.length >= 80) break;
+  }
+  return out;
+}
   const raw = String(cap || "");
   const m = raw.match(/^(\d+\.\d+)\.\s*(.*)$/) || raw.match(/^(\d+)\.\s*(.*)$/);
   return { num: m ? m[1] : "", title: short(raw) };
@@ -252,10 +288,18 @@ function paintHome() {
           <button class="chip" data-act="toggle-jump">${t("jump")}</button>
         </div>
         <input class="jump" id="jump" inputmode="text" placeholder="${t("jumpPh")}" />
+        <label class="search-wrap">
+          <i data-icon="search"></i>
+          <input class="search" data-act="search" value="${esc(state.qSearch)}" placeholder="${t("search")}" />
+        </label>
       </div>
-      ${groups
-        .map(
-          (g) => `<section class="index-parte">
+      ${
+        (() => {
+          const qstr = state.qSearch.trim();
+          if (!qstr) {
+            return groups
+              .map(
+                (g) => `<section class="index-parte">
         <h2>${esc(short(g.parte))}</h2>
         <div class="list">
           ${g.caps
@@ -270,8 +314,16 @@ function paintHome() {
             .join("")}
         </div>
       </section>`
-        )
-        .join("")}
+              )
+              .join("");
+          }
+          const hits = searchQuestions(state.qSearch);
+          return `<p class="hint">${hits.length} ${t("searchHits")}</p>
+        <div class="list" data-list="search">${
+          hits.length ? hits.map((q) => rowHTML(q, { starToggle: true })).join("") : `<p class="empty">${t("searchEmpty")}</p>`
+        }</div>`;
+        })()
+      }
     </main>
     ${tabBar("home")}`;
 }
@@ -614,16 +666,32 @@ function onInput(e) {
     state.marks.notes[r.n] = e.target.value;
     saveMarks();
   }
+  if (e.target.dataset.act === "search") {
+    state.qSearch = e.target.value;
+    const pos = e.target.selectionStart;
+    render();
+    const el = document.querySelector("[data-act=search]");
+    if (el) {
+      el.focus();
+      try {
+        el.setSelectionRange(pos, pos);
+      } catch {}
+    }
+  }
   if (e.target.dataset.act === "filter") {
-    const q = e.target.value.toLowerCase().trim();
+    const q = fold(e.target.value).trim();
     document.querySelectorAll("[data-list] .row").forEach((row) => {
-      row.style.display = !q || row.textContent.toLowerCase().includes(q) ? "" : "none";
+      row.style.display = !q || fold(row.textContent).includes(q) ? "" : "none";
     });
   }
 }
 
 function onKey(e) {
   if (e.target.id === "jump" && e.key === "Enter") {
+    const n = normalizeN(e.target.value);
+    if (state.byN.has(n)) go(`#/q/${n}`);
+  }
+  if (e.target.dataset.act === "search" && e.key === "Enter") {
     const n = normalizeN(e.target.value);
     if (state.byN.has(n)) go(`#/q/${n}`);
   }

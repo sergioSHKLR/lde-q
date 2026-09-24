@@ -236,7 +236,23 @@ button.row {
 }
 .row .n { font-size: 1.05rem; color: var(--accent); font-weight: 600; min-width: 2.4rem; }
 .row small { display: block; color: var(--muted); font-size: .78rem; }
-.index-head { margin: 0 0 1rem; }
+.search-wrap {
+  display: flex;
+  align-items: center;
+  gap: .45rem;
+  margin: .55rem 0 0;
+  padding: .15rem .7rem;
+  border: 1px solid var(--line);
+  border-radius: .7rem;
+  background: var(--card);
+}
+.search-wrap .search {
+  margin: 0;
+  border: 0;
+  background: transparent;
+  padding: .55rem 0;
+}
+.search-wrap [data-icon] { color: var(--muted); }
 .tagline {
   font-family: var(--sans);
   font-size: .82rem;
