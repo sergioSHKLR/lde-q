@@ -237,6 +237,14 @@ button.row {
 .row .n { font-size: 1.05rem; color: var(--accent); font-weight: 600; min-width: 2.4rem; }
 .row small { display: block; color: var(--muted); font-size: .78rem; }
 .index-head { margin: 0 0 1rem; }
+.tagline {
+  font-family: var(--sans);
+  font-size: .82rem;
+  font-weight: 600;
+  letter-spacing: .04em;
+  color: var(--muted);
+  margin: .25rem 0 .15rem;
+}
 .index-actions { display: flex; flex-wrap: wrap; gap: .4rem; margin: .55rem 0 .35rem; }
 .index-parte h2 {
   font-family: var(--sans);

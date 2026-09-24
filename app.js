@@ -15,7 +15,7 @@ const ui = {
     qs: "questões",
     sections: "secções",
     jumpPh: "22 ou 22a",
-    study: "questões · estudo",
+    study: "Leia · Comente · Compartilhe",
     theme: "Tema",
     langOff: "EN-US quando o catálogo inglês existir",
     spirit: "Espíritos",
@@ -52,7 +52,7 @@ const ui = {
     qs: "questions",
     sections: "sections",
     jumpPh: "22 or 22a",
-    study: "questions · study",
+    study: "Read · Comment · Share",
     theme: "Theme",
     langOff: "EN-US when the English catalog exists",
     spirit: "Spirits",
@@ -240,6 +240,7 @@ function paintHome() {
     <main class="page index">
       <div class="index-head">
         <div class="kicker"><i data-icon="sparkles" data-icon-size="16" class="brand"></i> ${t("book")}</div>
+        <p class="tagline">${t("study")}</p>
         <div class="index-actions">
           <button class="chip on" data-go="#/q/${last}">${resume ? t("resume") : t("start")} Q.${pretty(last)}</button>
           <button class="chip" data-act="toggle-jump">${t("jump")}</button>
