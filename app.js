@@ -121,6 +121,7 @@ function parseHash() {
   if (parts[0] === "marks") return { name: "marks" };
   if (parts[0] === "parte") return { name: "parte", parte: decodeURIComponent(parts.slice(1).join("/")) };
   if (parts[0] === "cap") return { name: "cap", cap: decodeURIComponent(parts.slice(1).join("/")) };
+  if (parts[0] === "sec") return { name: "sec", sec: decodeURIComponent(parts.slice(1).join("/")) };
   return { name: "home" };
 }
 function go(path) {
@@ -164,13 +165,13 @@ function tabBar(active) {
 }
 
 function crumbsFor(q) {
-  const parte = encodeURIComponent(q.parte || "");
   const cap = encodeURIComponent(q.cap || "");
-  return `<div class="crumbs">
+  const sec = encodeURIComponent(q.sec || "");
+  return `<nav class="crumbs" aria-label="breadcrumb">
     <button class="pill" data-go="#/">${t("bookCrumb")}</button>
-    ${q.parte ? `<button class="pill" data-go="#/parte/${parte}">${esc(short(q.parte))}</button>` : ""}
     ${q.cap ? `<button class="pill" data-go="#/cap/${cap}">${esc(short(q.cap))}</button>` : ""}
-  </div>`;
+    ${q.sec ? `<button class="pill" data-go="#/sec/${sec}">${esc(short(q.sec))}</button>` : ""}
+  </nav>`;
 }
 
 function short(s) {
@@ -255,14 +256,7 @@ function paintQ(n) {
       </div>
       <label class="hint" for="note">${t("note")}</label>
       <textarea class="note" id="note" data-act="note" placeholder="${t("notePh")}">${esc(note)}</textarea>
-      <aside class="comments">
-        <hyvor-talk-comments
-          website-id="${HYVOR_WEBSITE_ID}"
-          page-id="lde:${esc(n)}"
-          page-language="${state.pref.locale === "en-US" ? "en-US" : "pt-BR"}"
-          colors="${document.documentElement.dataset.theme === "dark" ? "dark" : "light"}"
-        ></hyvor-talk-comments>
-      </aside>
+      <aside class="comments" id="talk"></aside>
     </main>
     ${tabBar("q")}`;
 }
@@ -357,10 +351,10 @@ function paintParte(name) {
 function paintCap(name) {
   const rows = state.data.questions.filter((q) => q.cap === name);
   const parte = rows[0]?.parte;
-  return `${topBar(`<div class="crumbs">
+  return `${topBar(`<nav class="crumbs">
       <button class="pill" data-go="#/">${t("bookCrumb")}</button>
-      ${parte ? `<button class="pill" data-go="#/parte/${encodeURIComponent(parte)}">${esc(short(parte))}</button>` : ""}
-    </div>`)}
+      <button class="pill">${esc(short(name))}</button>
+    </nav>`)}
     <main class="page">
       <h1>${esc(name)}</h1>
       <div class="list">${rows.map(rowHTML).join("")}</div>
@@ -368,20 +362,54 @@ function paintCap(name) {
     ${tabBar("home")}`;
 }
 
+function paintSec(name) {
+  const rows = state.data.questions.filter((q) => q.sec === name);
+  const cap = rows[0]?.cap;
+  return `${topBar(`<nav class="crumbs">
+      <button class="pill" data-go="#/">${t("bookCrumb")}</button>
+      ${cap ? `<button class="pill" data-go="#/cap/${encodeURIComponent(cap)}">${esc(short(cap))}</button>` : ""}
+      <button class="pill">${esc(short(name))}</button>
+    </nav>`)}
+    <main class="page">
+      <h1>${esc(short(name))}</h1>
+      <div class="list">${rows.map(rowHTML).join("")}</div>
+    </main>
+    ${tabBar("home")}`;
+}
+
+function destroyTalk() {
+  document.querySelectorAll("hyvor-talk-comments").forEach((el) => el.remove());
+}
+
+function mountTalk(n) {
+  destroyTalk();
+  const host = document.getElementById("talk");
+  if (!host || !n) return;
+  const el = document.createElement("hyvor-talk-comments");
+  el.setAttribute("website-id", HYVOR_WEBSITE_ID);
+  el.setAttribute("page-id", "lde:" + n);
+  el.setAttribute("page-language", state.pref.locale === "en-US" ? "en-US" : "pt-BR");
+  el.setAttribute("colors", document.documentElement.dataset.theme === "dark" ? "dark" : "light");
+  host.appendChild(el);
+}
+
 function render() {
   applyTheme();
   const r = parseHash();
   const root = document.getElementById("app");
   root.className = "app";
+  destroyTalk();
   let html = "";
   if (r.name === "q") html = paintQ(r.n);
   else if (r.name === "fav") html = paintList("fav");
   else if (r.name === "marks") html = paintList("marks");
   else if (r.name === "parte") html = paintParte(r.parte);
   else if (r.name === "cap") html = paintCap(r.cap);
+  else if (r.name === "sec") html = paintSec(r.sec);
   else html = paintHome();
   root.innerHTML = html;
   hydrateIcons(root);
+  if (r.name === "q") mountTalk(r.n);
 }
 
 function onClick(e) {
