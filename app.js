@@ -1,3 +1,5 @@
+import { hydrateIcons } from "./icons.js";
+
 const HYVOR_WEBSITE_ID = "16128";
 const MARKS_KEY = "lde-q-marks-v1";
 const PREF_KEY = "lde-q-pref-v1";
@@ -130,7 +132,7 @@ function contentOf(q) {
 }
 
 function iconStar(on) {
-  return on ? "★" : "☆";
+  return `<i data-icon="star" data-icon-size="18"${on ? ' class="filled"' : ""}></i>`;
 }
 
 function topBar(extra = "") {
@@ -138,18 +140,18 @@ function topBar(extra = "") {
   return `<header class="top">
     <div class="grow">${extra}</div>
     <div class="tools">
-      <button class="iconbtn" data-act="theme" title="${t("theme")}">${document.documentElement.dataset.theme === "dark" ? "☾" : "☼"}</button>
-      <button class="lang" data-act="lang" data-off="${enOn ? "0" : "1"}" ${enOn ? "" : "disabled"} title="${t("langOff")}">PT-BR / EN-US</button>
+      <button class="iconbtn" data-act="theme" title="${t("theme")}"><i data-icon="${document.documentElement.dataset.theme === "dark" ? "moon" : "sun"}"></i></button>
+      <button class="lang" data-act="lang" data-off="${enOn ? "0" : "1"}" ${enOn ? "" : "disabled"} title="${t("langOff")}"><i data-icon="lang-pt" data-icon-size="16"></i><span>/</span><i data-icon="lang-en" data-icon-size="16"></i></button>
     </div>
   </header>`;
 }
 
 function tabBar(active) {
   return `<nav class="tabbar">
-    <button data-go="#/" class="${active === "home" ? "on" : ""}">${t("home")}</button>
-    <button data-go="#/q/${state.lastQ || "1"}" class="${active === "q" ? "on" : ""}">${t("q")}</button>
-    <button data-go="#/fav" class="${active === "fav" ? "on" : ""}">${t("fav")}</button>
-    <button data-go="#/marks" class="${active === "marks" ? "on" : ""}">${t("marks")}</button>
+    <button data-go="#/" class="${active === "home" ? "on" : ""}"><i data-icon="house"></i><span>${t("home")}</span></button>
+    <button data-go="#/q/${state.lastQ || "1"}" class="${active === "q" ? "on" : ""}"><i data-icon="book"></i><span>${t("q")}</span></button>
+    <button data-go="#/fav" class="${active === "fav" ? "on" : ""}"><i data-icon="star"></i><span>${t("fav")}</span></button>
+    <button data-go="#/marks" class="${active === "marks" ? "on" : ""}"><i data-icon="highlighter"></i><span>${t("marks")}</span></button>
   </nav>`;
 }
 
@@ -180,7 +182,7 @@ function paintHome() {
   const n = state.data?.count || 0;
   return `${topBar(`<strong>LDE</strong>`)}
     <main class="home">
-      <div class="kicker">O LIVRO</div>
+      <div class="kicker"><i data-icon="droplet" data-icon-size="18" class="brand"></i> O LIVRO</div>
       <h1>DOS ESPÍRITOS</h1>
       <div>Allan Kardec</div>
       <div class="rule"></div>
@@ -220,7 +222,7 @@ function paintQ(n) {
   return `${topBar(`${crumbsFor(q)}
       <div class="tools" style="margin-top:.35rem">
         <button class="iconbtn star ${fav ? "on" : ""}" data-act="fav">${iconStar(fav)}</button>
-        <button class="iconbtn" data-act="share" title="Share">↗</button>
+        <button class="iconbtn" data-act="share" title="Share"><i data-icon="share-2"></i></button>
       </div>`)}
     <main class="page">
       <div class="qnum">${esc(q.label)}</div>
@@ -232,8 +234,8 @@ function paintQ(n) {
       <label class="sub" style="display:block;margin-top:1rem">${t("note")}</label>
       <textarea class="note" data-act="note" placeholder="${t("notePh")}">${esc(note)}</textarea>
       <div class="qnav">
-        <button data-go="${q.prev ? `#/q/${q.prev}` : ""}" ${q.prev ? "" : "disabled"}>‹ ${q.prev ? "Q." + pretty(q.prev) : ""}</button>
-        <button data-go="${q.next ? `#/q/${q.next}` : ""}" ${q.next ? "" : "disabled"}>Q.${q.next ? pretty(q.next) : ""} ›</button>
+        <button data-go="${q.prev ? `#/q/${q.prev}` : ""}" ${q.prev ? "" : "disabled"}><i data-icon="chevron-left"></i> ${q.prev ? "Q." + pretty(q.prev) : ""}</button>
+        <button data-go="${q.next ? `#/q/${q.next}` : ""}" ${q.next ? "" : "disabled"}>Q.${q.next ? pretty(q.next) : ""} <i data-icon="chevron-right"></i></button>
       </div>
       <aside class="comments">
         <div class="sub">${t("comments")}</div>
@@ -286,7 +288,7 @@ function rowHTML(q) {
       <small>${esc(short(q.parte || ""))} · ${esc(short(q.cap || ""))}</small>
       ${excerpt ? `<small>“${esc(excerpt)}”</small>` : ""}
     </span>
-    <span class="star ${state.marks.favs.includes(q.n) ? "on" : ""}">${state.marks.favs.includes(q.n) ? "★" : ""}</span>
+    <span class="star ${state.marks.favs.includes(q.n) ? "on" : ""}">${state.marks.favs.includes(q.n) ? '<i data-icon="star" class="filled"></i>' : ""}</span>
   </button>`;
 }
 
@@ -326,6 +328,7 @@ function render() {
   else if (r.name === "cap") html = paintCap(r.cap);
   else html = paintHome();
   root.innerHTML = html;
+  hydrateIcons(root);
 }
 
 function onClick(e) {

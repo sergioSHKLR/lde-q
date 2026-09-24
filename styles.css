@@ -4,8 +4,8 @@
   --muted: #6b6258;
   --line: #ddd4c6;
   --card: #fbf7f0;
-  --accent: #6b4f2a;
-  --star: #b8860b;
+  --accent: #3c78d8;
+  --star: #3c78d8;
   --mark: #f3e08a;
   --safe-b: 5.5rem;
 }
@@ -15,8 +15,8 @@ html[data-theme="dark"] {
   --muted: #b3a99b;
   --line: #3a342c;
   --card: #24211c;
-  --accent: #d4b483;
-  --star: #e0b84a;
+  --accent: #6d9eef;
+  --star: #6d9eef;
   --mark: #6b5a1e;
 }
 * { box-sizing: border-box; }
@@ -210,3 +210,40 @@ h1 {
   font-size: .92rem;
 }
 .star.on { color: var(--star); }
+[data-icon] {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 0;
+  vertical-align: middle;
+}
+[data-icon] svg {
+  display: block;
+}
+.iconbtn [data-icon] svg,
+.tabbar [data-icon] svg {
+  width: 18px;
+  height: 18px;
+}
+.star.on [data-icon] svg,
+[data-icon].filled svg {
+  fill: currentColor;
+}
+.lang {
+  display: inline-flex;
+  align-items: center;
+  gap: .25rem;
+}
+.tabbar button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: .15rem;
+}
+.kicker {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: .4rem;
+}
+.kicker .brand { color: #3c78d8; }
