@@ -63,8 +63,9 @@ const ui = {
     langOff: "EN-US when the English catalog exists",
     spirit: "Spirits",
     kardec: "Kardec",
-    note: "Personal note (stays in your file)",
-    notePh: "Write a note only you hold…",
+    note: "Private note",
+    notePh: "Stays on this device…",
+    comments: "Public comments",
     notebook: "Notebook",
     fav: "Favorites",
     allMarks: "All",
@@ -375,7 +376,9 @@ function paintQ(n) {
       </div>
       <label class="hint" for="note">${t("note")}</label>
       <textarea class="note" id="note" data-act="note" placeholder="${t("notePh")}">${esc(note)}</textarea>
-      <aside class="comments" id="talk"></aside>
+      <aside class="comments" id="talk">
+        <div class="hint">${t("comments")}</div>
+      </aside>
     </main>
     ${tabBar("q")}`;
 }
@@ -732,3 +735,4 @@ async function boot() {
 }
 
 boot();
+oot();
