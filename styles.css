@@ -272,9 +272,28 @@ button.row {
   font-weight: 600;
   letter-spacing: .04em;
   color: var(--muted);
-  margin: .25rem 0 .15rem;
+  margin: .35rem 0 .15rem;
+  text-align: center;
 }
-.index-actions { display: flex; flex-wrap: wrap; gap: .4rem; margin: .55rem 0 .35rem; }
+.index-head {
+  text-align: center;
+  margin: .4rem 0 1.1rem;
+}
+.book-title {
+  font-family: var(--sans);
+  font-size: 1.85rem;
+  font-weight: 700;
+  letter-spacing: .02em;
+  line-height: 1.15;
+  margin: .2rem 0 0;
+}
+.index-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .4rem;
+  margin: .7rem 0 .35rem;
+  justify-content: center;
+}
 .index-parte h2 {
   font-family: var(--sans);
   font-size: .78rem;

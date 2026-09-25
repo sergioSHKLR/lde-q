@@ -283,7 +283,8 @@ function paintHome() {
   const groups = indexByParte();
   return `<main class="page index">
       <div class="index-head">
-        <div class="kicker"><i data-icon="sparkles" data-icon-size="16" class="brand"></i> ${t("book")}</div>
+        <div class="kicker"><i data-icon="sparkles" data-icon-size="22" class="brand"></i></div>
+        <h1 class="book-title">${t("book")}</h1>
         <p class="tagline">${t("study")}</p>
         <div class="index-actions">
           <button class="chip on" data-go="#/q/${last}">${resume ? t("resume") : t("start")} Q.${pretty(last)}</button>
