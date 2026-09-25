@@ -671,6 +671,49 @@ button.row {
   font-size: 1.85rem;
   line-height: 1;
 }
+.modal fieldset {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  margin: 0 0 .85rem;
+  padding: .7rem .9rem .8rem;
+  display: flex;
+  flex-direction: column;
+  gap: .45rem;
+}
+.modal legend {
+  font-family: var(--sans);
+  font-size: .8rem;
+  font-weight: 600;
+  color: var(--muted);
+  padding: 0 .35rem;
+}
+.modal fieldset > label {
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+  cursor: pointer;
+  font-family: var(--sans);
+  font-weight: 500;
+}
+.modal fieldset > label[disabled] {
+  opacity: .4;
+  cursor: not-allowed;
+}
+.modal fieldset .hint { margin: 0; }
+.modal fieldset a {
+  color: var(--accent);
+  font-weight: 600;
+  text-decoration: none;
+}
+.modal fieldset a:hover { text-decoration: underline; }
+.settings-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: .75rem;
+  margin: 0;
+  font-family: var(--sans);
+}
 .hyvor-row {
   display: flex;
   align-items: center;

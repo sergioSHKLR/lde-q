@@ -37,6 +37,7 @@ const ui = {
     langLabel: "Idioma",
     repo: "Repositório",
     legal: "Aviso",
+    about: "Sobre",
     legalFoot: "Aviso legal",
     commentPublic: "Ao comentar, o texto fica público.",
     onboardStart: "Começar",
@@ -125,6 +126,7 @@ const ui = {
     langLabel: "Language",
     repo: "Repository",
     legal: "Notice",
+    about: "About",
     legalFoot: "Legal notice",
     commentPublic: "Comments are public.",
     onboardStart: "Start",
@@ -1212,7 +1214,7 @@ function settingsModal() {
           <strong>${esc(user.name || user.username || "")}</strong>
           <small>${esc(user.username ? "@" + user.username : user.type || "hyvor")}</small>
         </div>
-        ${user.username ? `<a class="chip" href="https://hyvor.com/@${encodeURIComponent(user.username)}" target="_blank" rel="noopener">Hyvor</a>` : ""}
+        ${user.username ? `<a href="https://hyvor.com/@${encodeURIComponent(user.username)}" target="_blank" rel="noopener">Hyvor</a>` : ""}
         <button class="chip" data-act="hyvor-out">${t("hyvorOut")}</button>
       </div>`
     : `<p class="hint">${t("hyvorOff")}</p>`;
@@ -1222,40 +1224,44 @@ function settingsModal() {
         <strong>${t("settings")}</strong>
         <button class="iconbtn" data-act="close-settings" title="${t("close")}">×</button>
       </div>
-      <p class="set-title">${t("theme")}</p>
-      <div class="filters">
-        <button class="chip ${theme === "system" ? "on" : ""}" data-act="theme-set" data-theme="system"><i data-icon="monitor"></i> ${t("themeSystem")}</button>
-        <button class="chip ${theme === "light" ? "on" : ""}" data-act="theme-set" data-theme="light"><i data-icon="sun"></i> ${t("themeLight")}</button>
-        <button class="chip ${theme === "dark" ? "on" : ""}" data-act="theme-set" data-theme="dark"><i data-icon="moon"></i> ${t("themeDark")}</button>
-      </div>
-      <p class="set-title">${t("fontSize")}</p>
-      <div class="filters">
-        <button class="chip ${state.pref.fontSize === "sm" ? "on" : ""}" data-act="font-set" data-size="sm">${t("fontSm")}</button>
-        <button class="chip ${state.pref.fontSize !== "sm" && state.pref.fontSize !== "lg" ? "on" : ""}" data-act="font-set" data-size="md">${t("fontMd")}</button>
-        <button class="chip ${state.pref.fontSize === "lg" ? "on" : ""}" data-act="font-set" data-size="lg">${t("fontLg")}</button>
-      </div>
-      <p class="set-title">${t("langLabel")}</p>
-      <div class="filters">
-        <button class="chip ${state.pref.locale === "en-US" ? "" : "on"}" data-act="lang-set" data-lang="pt-BR">PT-BR</button>
-        <button class="chip ${state.pref.locale === "en-US" ? "on" : ""}" data-act="lang-set" data-lang="en-US" ${enOn ? "" : "disabled"} title="${t("langOff")}">EN-US</button>
-      </div>
-      <p class="set-title">${t("answersDefault")}</p>
-      <div class="filters">
-        <button class="chip ${state.pref.showAnswers ? "on" : ""}" data-act="answers-set" data-on="1"><i data-icon="eye"></i> ${t("showAnswers")}</button>
-        <button class="chip ${state.pref.showAnswers ? "" : "on"}" data-act="answers-set" data-on="0"><i data-icon="eye-off"></i> ${t("hideAnswers")}</button>
-      </div>
-      <p class="set-title">${t("grifoColors")}</p>
-      <div class="color-labels">
-        ${GRIFO.map((c) => `<label class="color-label"><span class="swatch" style="--sw:${c.hex}"></span><input id="grifo-${c.id}" name="grifo-${c.id}" data-act="color-label" data-color="${c.id}" value="${esc(colorLabel(c.id))}" /></label>`).join("")}
-      </div>
-      <p class="set-title">${t("hyvorAccount")}</p>
-      ${profile}
-      <p class="set-title">${t("version")}</p>
-      <p class="version-line">${APP_VERSION}</p>
-      <p class="set-title">${t("repo")}</p>
-      <a class="chip" href="${REPO_URL}" target="_blank" rel="noopener"><i data-icon="box"></i> github.com/sergioSHKLR/lde-q</a>
-      <p class="set-title">${t("legal")}</p>
-      <a class="chip" href="${LEGAL_URL}" target="_blank" rel="noopener"><i data-icon="scale"></i> ${t("legalFoot")}</a>
+      <fieldset>
+        <legend>${t("theme")}</legend>
+        <label data-act="theme-set" data-theme="system"><input type="radio" name="ui-theme" value="system"${theme === "system" ? " checked" : ""} /> ${t("themeSystem")}</label>
+        <label data-act="theme-set" data-theme="light"><input type="radio" name="ui-theme" value="light"${theme === "light" ? " checked" : ""} /> ${t("themeLight")}</label>
+        <label data-act="theme-set" data-theme="dark"><input type="radio" name="ui-theme" value="dark"${theme === "dark" ? " checked" : ""} /> ${t("themeDark")}</label>
+      </fieldset>
+      <fieldset>
+        <legend>${t("fontSize")}</legend>
+        <label data-act="font-set" data-size="sm"><input type="radio" name="ui-font" value="sm"${state.pref.fontSize === "sm" ? " checked" : ""} /> ${t("fontSm")}</label>
+        <label data-act="font-set" data-size="md"><input type="radio" name="ui-font" value="md"${state.pref.fontSize !== "sm" && state.pref.fontSize !== "lg" ? " checked" : ""} /> ${t("fontMd")}</label>
+        <label data-act="font-set" data-size="lg"><input type="radio" name="ui-font" value="lg"${state.pref.fontSize === "lg" ? " checked" : ""} /> ${t("fontLg")}</label>
+      </fieldset>
+      <fieldset>
+        <legend>${t("langLabel")}</legend>
+        <label data-act="lang-set" data-lang="pt-BR"><input type="radio" name="ui-lang" value="pt-BR"${state.pref.locale === "en-US" ? "" : " checked"} /> PT-BR</label>
+        <label data-act="lang-set" data-lang="en-US"${enOn ? "" : " disabled"} title="${t("langOff")}"><input type="radio" name="ui-lang" value="en-US"${state.pref.locale === "en-US" ? " checked" : ""}${enOn ? "" : " disabled"} /> EN-US</label>
+      </fieldset>
+      <fieldset>
+        <legend>${t("answersDefault")}</legend>
+        <label data-act="answers-set" data-on="1"><input type="radio" name="ui-answers" value="1"${state.pref.showAnswers ? " checked" : ""} /> ${t("showAnswers")}</label>
+        <label data-act="answers-set" data-on="0"><input type="radio" name="ui-answers" value="0"${state.pref.showAnswers ? "" : " checked"} /> ${t("hideAnswers")}</label>
+      </fieldset>
+      <fieldset>
+        <legend>${t("grifoColors")}</legend>
+        <div class="color-labels">
+          ${GRIFO.map((c) => `<label class="color-label"><span class="swatch" style="--sw:${c.hex}"></span><input id="grifo-${c.id}" name="grifo-${c.id}" data-act="color-label" data-color="${c.id}" value="${esc(colorLabel(c.id))}" /></label>`).join("")}
+        </div>
+      </fieldset>
+      <fieldset>
+        <legend>${t("hyvorAccount")}</legend>
+        ${profile}
+      </fieldset>
+      <fieldset>
+        <legend>${t("about")}</legend>
+        <p class="settings-meta"><span>${t("version")}</span><span class="version-line">${APP_VERSION}</span></p>
+        <p class="settings-meta"><a href="${REPO_URL}" target="_blank" rel="noopener">github.com/sergioSHKLR/lde-q</a></p>
+        <p class="settings-meta"><a href="${LEGAL_URL}" target="_blank" rel="noopener">${t("legalFoot")}</a></p>
+      </fieldset>
     </div>
   </div>`;
 }
