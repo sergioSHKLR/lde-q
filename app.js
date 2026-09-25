@@ -664,12 +664,19 @@ function paintQ(n) {
       </div>`
           : ``
       }
-      <div class="grifo-row verbs">
+      <div class="grifo-row verb-note">
         <button class="chip ${state.noteOpen ? "on" : ""}" data-act="toggle-note"><i data-icon="pencil"></i> ${t("note")}${note && !state.noteOpen ? " ·" : ""}</button>
         <span class="chip-side">${t("noteScope")}</span>
+      </div>
+      ${
+        state.noteOpen
+          ? `<textarea class="note" id="note" data-act="note"${t("notePh") ? ` placeholder="${esc(t("notePh"))}"` : ""}>${esc(note)}</textarea>`
+          : ""
+      }
+      <div class="verb-social">
         <button class="chip" data-act="comente"><i data-icon="message-circle"></i> ${t("comments")}</button>
         <span class="chip-side">${t("commentsScope")}</span>
-        <button class="chip" data-act="share" title="${t("share")}"><i data-icon="share-2"></i> ${t("share")}</button>
+        <button class="chip share-end" data-act="share" title="${t("share")}"><i data-icon="share-2"></i> ${t("share")}</button>
       </div>
       ${
         state.noteOpen

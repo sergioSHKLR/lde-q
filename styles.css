@@ -630,11 +630,20 @@ button.swatch.on { outline: 2px solid var(--ink); outline-offset: 2px; }
   gap: .4rem;
   margin: .35rem 0 .8rem;
 }
+.verb-note { margin-bottom: .35rem; }
 .chip-side {
   font-family: var(--sans);
   font-size: .72rem;
   color: var(--muted);
 }
+.verb-social {
+  display: flex;
+  align-items: center;
+  gap: .4rem;
+  margin: .15rem 0 .7rem;
+}
+.verb-social .share-end { margin-left: auto; }
+.note { margin-top: 0; margin-bottom: .65rem; }
 .swatch-chip { gap: .4rem; }
 .color-labels { display: grid; gap: .45rem; margin: 0 0 .8rem; }
 .color-label {
