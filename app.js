@@ -37,6 +37,7 @@ const ui = {
     comments: "Comentários públicos",
     shareFail: "Copia o endereço da questão para partilhar.",
     copied: "Ligação copiada",
+    share: "Partilhar",
     export: "Exportar caderno",
     import: "Importar caderno",
     highlightHint: "Selecione texto e clique Grifar",
@@ -86,6 +87,7 @@ const ui = {
     comments: "Public comments",
     shareFail: "Copy the question URL to share.",
     copied: "Link copied",
+    share: "Share",
     export: "Export notebook",
     import: "Import notebook",
     highlightHint: "Select text, then tap Highlight",
@@ -421,7 +423,9 @@ function paintQ(n) {
           <button class="iconbtn" data-act="answers" title="${shown ? t("hideAnswers") : t("showAnswers")}">
             <i data-icon="${shown ? "eye" : "eye-off"}"></i>
           </button>
-          <button class="iconbtn" data-act="share" title="Share"><i data-icon="share-2"></i></button>
+          <button class="iconbtn" data-act="share" title="${t("share")}">
+            <i data-icon="share-2"></i>
+          </button>
         </div>
         <button class="iconbtn" data-go="${q.next ? `#/q/${q.next}` : ""}" ${q.next ? "" : "disabled"} title="${t("next")}">
           <i data-icon="chevron-right"></i>
@@ -663,6 +667,12 @@ function onClick(e) {
       state.pref.showAnswers = !state.pref.showAnswers;
       savePref();
       render();
+      return;
+    }
+    if (a === "share") {
+      e.preventDefault();
+      e.stopPropagation();
+      shareQuestion();
       return;
     }
   }
