@@ -3,26 +3,35 @@ on:
   workflow_dispatch:
   push:
     paths:
-      - "pwa/*.b64"
       - ".github/workflows/decode-pwa-icons.yml"
 permissions:
   contents: write
 jobs:
-  decode:
+  recolor:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Decode base64 icons to PNG
+      - name: Flatten cream icon field to white
         run: |
           python3 - <<'PY'
           from pathlib import Path
-          import base64
-          for p in sorted(Path("pwa").glob("*.png.b64")):
-              dest = Path(str(p)[:-4])
-              dest.write_bytes(base64.b64decode(p.read_text().strip()))
-              print(dest, dest.stat().st_size)
+          from PIL import Image
+          paper = (244, 239, 230)
+          for p in sorted(Path("pwa").glob("*.png")):
+              im = Image.open(p).convert("RGBA")
+              px = im.load()
+              w, h = im.size
+              for y in range(h):
+                  for x in range(w):
+                      r, g, b, a = px[x, y]
+                      d = ((r-244)**2 + (g-239)**2 + (b-230)**2) ** 0.5
+                      luma = 0.299*r + 0.587*g + 0.114*b
+                      if a == 0 or d < 28 or (luma > 232 and abs(r-g) < 18 and abs(g-b) < 22):
+                          px[x, y] = (255, 255, 255, 255)
+              im.save(p, "PNG", optimize=True)
+              print(p, im.size, im.getpixel((0, 0)))
           PY
       - uses: stefanzweifel/git-auto-commit-action@v5
         with:
-          commit_message: Decode white PWA PNG icons
+          commit_message: White-field PWA PNG icons
           file_pattern: pwa/*.png
