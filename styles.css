@@ -256,7 +256,10 @@ h1 {
   margin: .35rem 0 .7rem;
 }
 .modal .kicker { margin-bottom: .2rem; }
-.modal .chip.on { width: 100%; justify-content: center; }
+.modal [data-act="onboard-start"] {
+  width: 100%;
+  justify-content: center;
+}
 .block {
   background: var(--card);
   border: 1px solid var(--line);
