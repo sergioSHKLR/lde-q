@@ -911,7 +911,8 @@ function onClick(e) {
     }
     if (a === "onboard-start") {
       e.preventDefault();
-      dismissOnboard(true);
+      dismissOnboard(false);
+      go("#/");
       return;
     }
     if (a === "onboard-skip") {
