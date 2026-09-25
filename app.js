@@ -979,7 +979,6 @@ function onboardCard() {
         <li>${t("onboardShare")}</li>
       </ul>
       <button class="chip on" data-act="onboard-start">${t("onboardStart")}</button>
-      <p class="legal-foot"><a href="${LEGAL_URL}" target="_blank" rel="noopener">${t("legalFoot")}</a></p>
     </div>
   </div>`;
 }
