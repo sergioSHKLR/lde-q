@@ -1,4 +1,4 @@
-const CACHE = "lde-q-v21";
+const CACHE = "lde-q-v22";
 const PRECACHE = [
   "./",
   "./index.html",
@@ -7,6 +7,7 @@ const PRECACHE = [
   "./styles.css",
   "./led.css",
   "./led.js",
+  "./se.js",
   "./manifest.webmanifest",
   "./brand/lde-favicon.svg",
   "./pwa/lde-192.png",
