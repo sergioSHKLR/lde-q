@@ -266,6 +266,16 @@ button.row {
   padding: .55rem 0;
 }
 .search-wrap [data-icon] { color: var(--muted); flex: 0 0 auto; }
+.search-wrap .clear {
+  border: 0;
+  background: transparent;
+  color: var(--muted);
+  font-size: 1.2rem;
+  line-height: 1;
+  padding: .15rem .35rem;
+  cursor: pointer;
+  font-family: var(--sans);
+}
 [data-icon="search"] svg { transform: scaleX(-1); }
 .history {
   text-align: left;

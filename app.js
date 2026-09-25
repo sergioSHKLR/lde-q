@@ -353,7 +353,10 @@ function paintHome() {
         </div>
         ${
           state.panel === "history"
-            ? `<input class="jump show" data-act="hist-filter" value="${esc(state.histFilter)}" placeholder="${t("filter")}" />
+            ? `<label class="search-wrap">
+          <input class="search" data-act="hist-filter" value="${esc(state.histFilter)}" placeholder="${t("filter")}" />
+          ${state.histFilter ? `<button class="clear" type="button" data-act="clear-hist" aria-label="Limpar">×</button>` : ""}
+        </label>
         <div class="history">${
           hist.filter((q) => !state.histFilter.trim() || fold(contentOf(q).prompt + " " + q.n + " " + q.label).includes(fold(state.histFilter))).length
             ? hist
@@ -370,6 +373,7 @@ function paintHome() {
             : state.panel === "search"
               ? `<label class="search-wrap">
           <input class="search" data-act="search" value="${esc(state.qSearch)}" placeholder="${t("search")}" />
+          ${state.qSearch ? `<button class="clear" type="button" data-act="clear-search" aria-label="Limpar">×</button>` : ""}
           <i data-icon="search"></i>
         </label>`
               : ""
@@ -536,7 +540,10 @@ function paintList(filter) {
         <button class="chip ${filter === "fav" ? "on" : ""}" data-go="#/caderno/fav">${t("fav")}</button>
         <button class="chip ${filter === "marks" ? "on" : ""}" data-go="#/caderno/marks">${t("marks")}</button>
       </div>
-      <input class="search" data-act="filter" placeholder="${t("filter")}" />
+      <label class="search-wrap">
+        <input class="search" data-act="filter" placeholder="${t("filter")}" />
+        <button class="clear" type="button" data-act="clear-filter" hidden aria-label="Limpar">×</button>
+      </label>
       <div class="index-actions">
         <button class="chip" data-act="export">${t("export")}</button>
         <label class="chip"><input type="file" accept="application/json" hidden data-act="import" />${t("import")}</label>
@@ -772,7 +779,33 @@ function onClick(e) {
       render();
       return;
     }
-    if (a === "answers-set") {
+    if (a === "clear-search") {
+      e.preventDefault();
+      state.qSearch = "";
+      render();
+      const el = document.querySelector("[data-act=search]");
+      if (el) el.focus();
+      return;
+    }
+    if (a === "clear-hist") {
+      e.preventDefault();
+      state.histFilter = "";
+      render();
+      const el = document.querySelector("[data-act=hist-filter]");
+      if (el) el.focus();
+      return;
+    }
+    if (a === "clear-filter") {
+      e.preventDefault();
+      const input = document.querySelector("[data-act=filter]");
+      if (input) {
+        input.value = "";
+        input.dispatchEvent(new Event("input", { bubbles: true }));
+      }
+      const x = actEl;
+      if (x) x.hidden = true;
+      return;
+    }
       e.preventDefault();
       state.pref.showAnswers = actEl.dataset.on === "1";
       savePref();
@@ -923,6 +956,8 @@ function onInput(e) {
   }
   if (e.target.dataset.act === "filter") {
     const q = fold(e.target.value).trim();
+    const x = e.target.parentElement && e.target.parentElement.querySelector(".clear");
+    if (x) x.hidden = !e.target.value;
     document.querySelectorAll("[data-list] .row").forEach((row) => {
       row.style.display = !q || fold(row.textContent).includes(q) ? "" : "none";
     });
