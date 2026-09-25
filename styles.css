@@ -544,6 +544,12 @@ button.row {
   font-family: var(--sans);
   margin-bottom: .4rem;
 }
+.modal-head .iconbtn {
+  width: 2.6rem;
+  height: 2.6rem;
+  font-size: 1.85rem;
+  line-height: 1;
+}
 .hyvor-row {
   display: flex;
   align-items: center;
