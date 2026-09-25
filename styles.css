@@ -203,7 +203,7 @@ h1 {
 .note {
   width: 100%;
   min-height: 2.6rem;
-  border: 1px dashed var(--line);
+  border: 1px solid var(--line);
   background: transparent;
   border-radius: .55rem;
   padding: .45rem .6rem;
@@ -212,7 +212,6 @@ h1 {
 .note:focus {
   outline: none;
   background: #fff;
-  border-style: solid;
   border-color: var(--line);
 }
 html[data-theme="dark"] .note:focus {
@@ -311,11 +310,11 @@ html[data-theme="dark"] .note:focus {
   justify-content: center;
 }
 .block {
-  background: var(--card);
-  border: 1px solid var(--line);
-  border-radius: .8rem;
-  padding: .9rem 1rem;
-  margin: .7rem 0;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  padding: 0;
+  margin: .9rem 0;
 }
 .block h2 {
   margin: 0 0 .35rem;
@@ -348,10 +347,11 @@ html[data-theme="dark"] .note:focus {
   grid-template-columns: auto 1fr;
   gap: .7rem;
   align-items: start;
-  padding: .7rem .75rem;
-  border: 1px solid var(--line);
-  border-radius: .8rem;
-  background: var(--card);
+  padding: .7rem 0;
+  border: 0;
+  border-bottom: 1px solid var(--line);
+  border-radius: 0;
+  background: transparent;
   text-align: left;
   cursor: pointer;
   width: 100%;
@@ -361,10 +361,11 @@ button.row {
   grid-template-columns: auto 1fr;
   gap: .7rem;
   align-items: start;
-  padding: .7rem .75rem;
-  border: 1px solid var(--line);
-  border-radius: .8rem;
-  background: var(--card);
+  padding: .7rem 0;
+  border: 0;
+  border-bottom: 1px solid var(--line);
+  border-radius: 0;
+  background: transparent;
   text-align: left;
   cursor: pointer;
 }
