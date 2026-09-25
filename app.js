@@ -987,6 +987,16 @@ function destroyTalk() {
   document.querySelectorAll("hyvor-talk-comments").forEach((el) => el.remove());
 }
 
+function containTalk(el) {
+  if (!el) return;
+  const root = el.shadowRoot;
+  if (!root || root.getElementById("lde-contain")) return;
+  const s = document.createElement("style");
+  s.id = "lde-contain";
+  s.textContent = ":host{display:block;width:100%;max-width:100%;min-width:0;overflow:hidden;box-sizing:border-box}*{box-sizing:border-box;max-width:100%}";
+  root.appendChild(s);
+}
+
 function mountTalk(n) {
   destroyTalk();
   const host = document.getElementById("talk");
@@ -997,6 +1007,9 @@ function mountTalk(n) {
   el.setAttribute("page-language", state.pref.locale === "en-US" ? "en-US" : "pt-BR");
   el.setAttribute("colors", document.documentElement.dataset.theme === "dark" ? "dark" : "light");
   host.appendChild(el);
+  containTalk(el);
+  setTimeout(() => containTalk(el), 300);
+  setTimeout(() => containTalk(el), 1200);
   setTimeout(readHyvorUser, 1200);
   setTimeout(readHyvorUser, 4000);
 }
@@ -1359,11 +1372,15 @@ function onKey(e) {
 function fitViewport() {
   const vv = window.visualViewport;
   const h = vv ? vv.height : window.innerHeight;
+  const w = vv ? vv.width : window.innerWidth;
   const top = vv ? vv.offsetTop : 0;
+  const left = vv ? vv.offsetLeft : 0;
   const gap = Math.max(0, window.innerHeight - top - h);
   const root = document.documentElement;
   root.style.setProperty("--app-h", Math.round(h) + "px");
+  root.style.setProperty("--app-w", Math.round(w) + "px");
   root.style.setProperty("--vv-top", Math.round(top) + "px");
+  root.style.setProperty("--vv-left", Math.round(left) + "px");
   root.style.setProperty("--vv-bottom", Math.round(gap) + "px");
 }
 

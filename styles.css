@@ -57,11 +57,11 @@ img, svg, video, iframe {
 .app {
   position: fixed;
   top: var(--vv-top, 0px);
-  left: 0;
-  right: 0;
+  left: var(--vv-left, 0px);
+  width: var(--app-w, 100%);
+  max-width: var(--app-w, 100%);
   height: var(--app-h, 100svh);
-  max-width: 100%;
-  overflow-x: clip;
+  overflow-x: hidden;
   overflow-y: auto;
   overscroll-behavior: contain;
   padding-bottom: var(--safe-b);
@@ -231,19 +231,17 @@ html[data-theme="dark"] .note:focus {
   margin-top: 1rem;
   padding-top: .75rem;
   border-top: 1px solid var(--line);
-}
-.comments-head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: .5rem;
-  flex-wrap: wrap;
-  margin-bottom: .35rem;
+  max-width: 100%;
+  min-width: 0;
+  overflow: hidden;
 }
 #talk, hyvor-talk-comments {
   display: block;
+  width: 100%;
   max-width: 100%;
-  overflow-x: auto;
+  min-width: 0;
+  overflow: hidden;
+  box-sizing: border-box;
 }
 .legal-foot {
   text-align: center;
@@ -476,9 +474,11 @@ button.row {
   color: var(--muted);
 }
 .tabbar {
-  position: fixed; left: 0; right: 0; bottom: var(--vv-bottom, 0px);
-  width: 100%;
-  max-width: 100%;
+  position: fixed;
+  left: var(--vv-left, 0px);
+  bottom: var(--vv-bottom, 0px);
+  width: var(--app-w, 100%);
+  max-width: var(--app-w, 100%);
   display: grid; grid-template-columns: repeat(3, 1fr);
   border-top: 1px solid #000;
   background: #111;
