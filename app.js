@@ -393,7 +393,6 @@ function paintHome() {
   return `<main class="page index">
       <div class="index-head">
         <button class="iconbtn settings-corner" data-act="open-settings" title="${t("settings")}"><i data-icon="settings"></i></button>
-        <div class="kicker"><i data-icon="sparkles" data-icon-size="22" class="brand"></i></div>
         <h1 class="book-title">${t("book")}</h1>
         <p class="tagline">${t("study")}</p>
         <div class="index-actions">
