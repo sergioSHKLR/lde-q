@@ -3,7 +3,7 @@ import { hydrateIcons } from "./icons.js";
 const HYVOR_WEBSITE_ID = "16128";
 const APP_VERSION = "0.3.0";
 const REPO_URL = "https://github.com/sergioSHKLR/lde-q";
-const LEGAL_URL = "https://shklr.org/aviso";
+const LEGAL_URL = "https://shklr.org/legal";
 const GRIFO = [
   { id: "gold", hex: "#f3e08a", labelPt: "Ouro", labelEn: "Gold" },
   { id: "green", hex: "#b7e0b4", labelPt: "Verde", labelEn: "Green" },
