@@ -9,7 +9,7 @@
   "display": "standalone",
   "orientation": "any",
   "background_color": "#ffffff",
-  "theme_color": "#d4af37",
+  "theme_color": "#ffffff",
   "lang": "pt-BR",
   "categories": ["books", "education"],
   "icons": [
