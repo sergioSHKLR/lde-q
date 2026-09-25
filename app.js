@@ -78,7 +78,7 @@ const ui = {
     fileLocal: "Só neste aparelho — desinstalar apaga.",
     fileLinked: "Fora do app. Sobrevive a desinstalar.",
     fileUnsupported: "Este navegador não guarda arquivo fora do app. Use Exportar.",
-    highlightHint: "Escolha a cor, selecione o texto e clique Grifar",
+    highlightHint: "Escolha cor, selecione texto e clique Grifar",
     highlight: "Grifar",
     grifoColors: "Cores do grifo",
     bookCrumb: "LDE",
@@ -158,7 +158,7 @@ const ui = {
     fileLocal: "This device only — uninstall wipes it.",
     fileLinked: "Outside the app. Survives uninstall.",
     fileUnsupported: "This browser cannot keep a file outside the app. Use Export.",
-    highlightHint: "Pick a color, select the text, then tap Highlight",
+    highlightHint: "Pick a color, select text, then tap Highlight",
     highlight: "Highlight",
     grifoColors: "Highlight colors",
     bookCrumb: "LDE",
@@ -1159,7 +1159,9 @@ function onClick(e) {
       e.preventDefault();
       state.pref.grifoColor = colorId(actEl.dataset.color);
       savePref();
-      render();
+      document.querySelectorAll("[data-act=grifo-color]").forEach((btn) => {
+        btn.classList.toggle("on", btn.dataset.color === state.pref.grifoColor);
+      });
       return;
     }
     if (a === "lang-set") {
@@ -1366,7 +1368,9 @@ async function boot() {
     for (const q of state.data.questions) state.byN.set(q.n, q);
     state.lastQ = state.history.find((n) => state.byN.has(n)) || "1";
     await restoreCadernoFile();
-    root.addEventListener("click", onClick);
+    root.addEventListener("pointerdown", (e) => {
+      if (e.target.closest("[data-act=grifo-color]")) e.preventDefault();
+    });
     root.addEventListener("change", onChange);
     root.addEventListener("input", onInput);
     root.addEventListener("keydown", onKey);
