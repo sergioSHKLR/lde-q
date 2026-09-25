@@ -43,7 +43,7 @@ const ui = {
     onboardAnote: "Anote fica neste aparelho.",
     onboardComente: "Comente é público (Hyvor).",
     onboardShare: "Compartilhar envia o endereço da questão.",
-    onboardEye: "Respostas começam ocultas. O olho mostra.",
+    onboardEye: "O olho oculta ou mostra as respostas.",
     version: "Versão",
     hyvorAccount: "Perfil Hyvor",
     hyvorOff: "Abre uma questão e entra no Hyvor para ver o perfil aqui.",
@@ -115,7 +115,7 @@ const ui = {
     onboardAnote: "Notes stay on this device.",
     onboardComente: "Comments are public (Hyvor).",
     onboardShare: "Share sends the question URL.",
-    onboardEye: "Answers start hidden. The eye reveals them.",
+    onboardEye: "The eye hides or shows the answers.",
     version: "Version",
     hyvorAccount: "Hyvor profile",
     hyvorOff: "Open a question and sign in to Hyvor to see the profile here.",
@@ -180,9 +180,12 @@ const state = {
 
 function loadPref() {
   try {
-    return { theme: "system", locale: "pt-BR", showAnswers: false, grifoColor: "gold", colorLabels: {}, ...JSON.parse(localStorage.getItem(PREF_KEY) || "{}") };
+    const raw = JSON.parse(localStorage.getItem(PREF_KEY) || "{}");
+    const next = { theme: "system", locale: "pt-BR", showAnswers: true, grifoColor: "gold", colorLabels: {}, ...raw };
+    if (!raw.answersUserSet) next.showAnswers = true;
+    return next;
   } catch {
-    return { theme: "system", locale: "pt-BR", showAnswers: false, grifoColor: "gold", colorLabels: {} };
+    return { theme: "system", locale: "pt-BR", showAnswers: true, grifoColor: "gold", colorLabels: {} };
   }
 }
 function savePref() {
@@ -896,6 +899,7 @@ function onClick(e) {
       e.preventDefault();
       e.stopPropagation();
       state.pref.showAnswers = !state.pref.showAnswers;
+      state.pref.answersUserSet = true;
       savePref();
       render();
       return;
@@ -969,6 +973,7 @@ function onClick(e) {
     if (a === "answers-set") {
       e.preventDefault();
       state.pref.showAnswers = actEl.dataset.on === "1";
+      state.pref.answersUserSet = true;
       savePref();
       render();
       return;
