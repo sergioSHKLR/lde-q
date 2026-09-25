@@ -23,7 +23,7 @@ const ui = {
     history: "Histórico",
     emptyHistory: "Ainda sem histórico.",
     emptyFav: "Ainda sem favoritas. Toca na estrela.",
-    emptyMarks: "Ainda sem destaques nem notas.",
+    emptyMarks: "Ainda sem grifos.",
     qs: "questões",
     sections: "secções",
     jumpPh: "22 ou 22a",
@@ -51,12 +51,12 @@ const ui = {
     notebook: "Caderno",
     fav: "Favoritas",
     allMarks: "Tudo",
-    marks: "Destaques",
+    marks: "Grifos",
     home: "Início",
     q: "Questão",
     allMarks: "Tudo",
     emptyFav: "Ainda sem favoritas. Toca na estrela.",
-    emptyMarks: "Ainda sem destaques nem notas.",
+    emptyMarks: "Ainda sem grifos.",
     emptyAll: "O caderno está vazio.",
     comments: "Comente (público)",
     shareFail: "Copia o endereço da questão para partilhar.",
@@ -88,7 +88,7 @@ const ui = {
     history: "History",
     emptyHistory: "No history yet.",
     emptyFav: "No favorites yet. Tap the star.",
-    emptyMarks: "No highlights or notes yet.",
+    emptyMarks: "No highlights yet.",
     qs: "questions",
     sections: "sections",
     jumpPh: "22 or 22a",
@@ -122,7 +122,7 @@ const ui = {
     q: "Question",
     allMarks: "All",
     emptyFav: "No favorites yet. Tap the star.",
-    emptyMarks: "No highlights or notes yet.",
+    emptyMarks: "No highlights yet.",
     emptyAll: "The notebook is empty.",
     comments: "Comment (public)",
     shareFail: "Copy the question URL to share.",
@@ -158,6 +158,7 @@ const state = {
   panel: null,
   showSettings: false,
   hyvorUser: null,
+  noteOpen: false,
 };
 
 function loadPref() {
@@ -262,10 +263,8 @@ function iconStar(on) {
 }
 
 function topBar(extra = "") {
-  const onHome = parseHash().name === "home";
   return `<header class="top">
     <div class="grow">${extra}</div>
-    ${onHome ? "" : `<button class="iconbtn" data-act="open-search" title="${t("search")}"><i data-icon="search"></i></button>`}
     <button class="iconbtn" data-act="open-settings" title="${t("settings")}"><i data-icon="settings"></i></button>
   </header>`;
 }
@@ -412,7 +411,6 @@ function paintHome() {
       ${
         (() => {
           const qstr = state.panel === "search" ? state.qSearch.trim() : "";
-          if (state.panel === "history") return "";
           if (!qstr) {
             return groups
               .map(
@@ -506,8 +504,12 @@ function paintQ(n) {
       </div>`
           : ``
       }
-      <label class="hint" for="note">${t("note")}</label>
-      <textarea class="note" id="note" data-act="note"${t("notePh") ? ` placeholder="${esc(t("notePh"))}"` : ""}>${esc(note)}</textarea>
+      <button type="button" class="hint note-toggle" data-act="toggle-note">${t("note")}${note ? " ·" : ""}</button>
+      ${
+        state.noteOpen
+          ? `<textarea class="note" id="note" data-act="note"${t("notePh") ? ` placeholder="${esc(t("notePh"))}"` : ""}>${esc(note)}</textarea>`
+          : ""
+      }
       <aside class="comments" id="talk">
         <div class="comments-head">
           <div class="hint">${t("comments")}</div>
@@ -564,9 +566,10 @@ function pretty(n) {
 function paintList(filter) {
   const qAll = state.data.questions;
   const isFav = (q) => state.marks.favs.includes(q.n);
-  const isMark = (q) => (state.marks.highlights[q.n] || []).length || String(state.marks.notes[q.n] || "").trim();
+  const isMark = (q) => (state.marks.highlights[q.n] || []).length;
   const isColor = (q) => (state.marks.highlights[q.n] || []).some((h) => colorId(h.color) === filter);
-  let rows = qAll.filter((q) => isFav(q) || isMark(q));
+  const isNote = (q) => String(state.marks.notes[q.n] || "").trim();
+  let rows = qAll.filter((q) => isFav(q) || isMark(q) || isNote(q));
   if (filter === "fav") rows = qAll.filter(isFav);
   if (filter === "marks") rows = qAll.filter(isMark);
   if (GRIFO_IDS.includes(filter)) rows = qAll.filter(isColor);
@@ -576,9 +579,16 @@ function paintList(filter) {
       <div class="filters">
         <button class="chip ${filter === "all" ? "on" : ""}" data-go="#/caderno">${t("allMarks")}</button>
         <button class="chip ${filter === "fav" ? "on" : ""}" data-go="#/caderno/fav">${t("fav")}</button>
-        <button class="chip ${filter === "marks" ? "on" : ""}" data-go="#/caderno/marks">${t("marks")}</button>
-        ${GRIFO.map((c) => `<button class="chip swatch-chip ${filter === c.id ? "on" : ""}" data-go="#/caderno/${c.id}" title="${esc(colorLabel(c.id))}"><span class="swatch" style="--sw:${c.hex}"></span>${esc(colorLabel(c.id))}</button>`).join("")}
+        <button class="chip ${filter === "marks" || GRIFO_IDS.includes(filter) ? "on" : ""}" data-go="#/caderno/marks">${t("marks")}</button>
       </div>
+      ${
+        filter === "marks" || GRIFO_IDS.includes(filter)
+          ? `<div class="filters">${GRIFO.map(
+              (c) =>
+                `<button class="chip swatch-chip ${filter === c.id ? "on" : ""}" data-go="#/caderno/${c.id}" title="${esc(colorLabel(c.id))}"><span class="swatch" style="--sw:${c.hex}"></span>${esc(colorLabel(c.id))}</button>`
+            ).join("")}</div>`
+          : ""
+      }
       <label class="search-wrap">
         <input class="search" data-act="filter" placeholder="${t("filter")}" />
         <button class="clear" type="button" data-act="clear-filter" hidden aria-label="Limpar">×</button>
@@ -850,6 +860,14 @@ function onClick(e) {
       }
       const x = actEl;
       if (x) x.hidden = true;
+      return;
+    }
+    if (a === "toggle-note") {
+      e.preventDefault();
+      state.noteOpen = !state.noteOpen;
+      render();
+      const el = document.getElementById("note");
+      if (el) el.focus();
       return;
     }
     if (a === "answers-set") {
