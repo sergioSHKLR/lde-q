@@ -1,9 +1,9 @@
 :root {
   --paper: #ffffff;
-  --ink: #1c1916;
-  --muted: #6b6258;
-  --line: #ddd4c6;
-  --card: #fbf7f0;
+  --ink: #111;
+  --muted: #555;
+  --line: #ccc;
+  --card: #fff;
   --accent: #d4af37;
   --star: #d4af37;
   --mark: #f3e08a;
@@ -12,11 +12,11 @@
   --serif: "Iowan Old Style", "Palatino Linotype", Palatino, "Book Antiqua", Georgia, serif;
 }
 html[data-theme="dark"] {
-  --paper: #1a1815;
-  --ink: #efe8dc;
-  --muted: #b3a99b;
-  --line: #3a342c;
-  --card: #24211c;
+  --paper: #1a1a1a;
+  --ink: #f0f0f0;
+  --muted: #a0a0a0;
+  --line: #444;
+  --card: #0a0a0a;
   --accent: #e6c35c;
   --star: #e6c35c;
   --mark: #6b5a1e;
@@ -434,19 +434,13 @@ button.row {
   margin: .4rem 0 1.1rem;
   position: relative;
 }
-.settings-corner {
-  position: absolute;
-  top: 0;
-  right: 0;
-  z-index: 2;
-}
 .book-title {
   font-family: var(--serif);
   font-size: 1.35rem;
   font-weight: 600;
   letter-spacing: 0;
   line-height: 1.2;
-  margin: .2rem 2.4rem 0;
+  margin: .2rem 0 0;
 }
 .arquivo {
   position: fixed;
@@ -547,7 +541,7 @@ button.row {
   bottom: var(--vv-bottom, 0px);
   width: var(--app-w, 100%);
   max-width: var(--app-w, 100%);
-  display: grid; grid-template-columns: repeat(3, 1fr);
+  display: grid; grid-template-columns: 1fr 1fr 1fr auto;
   border-top: 1px solid #000;
   background: #111;
   color: #fff;
@@ -569,6 +563,10 @@ button.row {
 }
 .tabbar button.on { color: #fff; }
 .tabbar button.on [data-icon] svg { stroke: var(--accent); }
+.tabbar .tab-set {
+  width: 3.1rem;
+  color: rgba(255,255,255,.92);
+}
 .tabbar [data-icon] svg {
   width: 1.35rem;
   height: 1.35rem;
@@ -632,16 +630,17 @@ button.row {
   background: rgba(0,0,0,.45);
   z-index: 50;
   display: flex;
-  align-items: flex-end;
+  align-items: center;
   justify-content: center;
-  padding: 0 0 calc(4.6rem + env(safe-area-inset-bottom));
+  padding: 1rem;
+  padding-bottom: calc(4.6rem + env(safe-area-inset-bottom));
   overflow: hidden;
   overscroll-behavior: none;
   touch-action: none;
 }
 .modal {
   font-family: var(--sans);
-  width: min(28rem, 100%);
+  width: min(420px, 92vw);
   max-width: 100%;
   min-height: 0;
   max-height: min(80dvh, calc(100dvh - 5.2rem - env(safe-area-inset-bottom, 0px)));
@@ -649,10 +648,10 @@ button.row {
   overscroll-behavior: contain;
   -webkit-overflow-scrolling: touch;
   touch-action: pan-y;
-  background: var(--paper);
+  background: var(--card);
   color: var(--ink);
   border: 1px solid var(--line);
-  border-radius: 1rem 1rem .4rem .4rem;
+  border-radius: 12px;
   padding: 1rem 1.1rem 1.3rem;
 }
 .modal-head {
@@ -660,8 +659,11 @@ button.row {
   align-items: center;
   justify-content: space-between;
   font-family: var(--sans);
-  font-weight: 700;
-  margin-bottom: .4rem;
+  font-weight: 600;
+  min-height: 50px;
+  margin: -1rem -1.1rem .9rem;
+  padding: 0 .35rem 0 1.1rem;
+  border-bottom: 1px solid var(--line);
 }
 .hyvor-row strong { font-weight: 700; }
 .hyvor-row small { font-weight: 500; }

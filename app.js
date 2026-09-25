@@ -712,7 +712,6 @@ function iconStar(on) {
 function topBar(extra = "") {
   return `<header class="top">
     <div class="grow">${extra}</div>
-    <button class="iconbtn" data-act="open-settings" title="${t("settings")}"><i data-icon="settings"></i></button>
   </header>`;
 }
 
@@ -721,6 +720,7 @@ function tabBar(active) {
     <button data-go="#/" class="${active === "home" ? "on" : ""}"><i data-icon="sparkles"></i><span>${t("home")}</span></button>
     <button data-go="#/q/${state.lastQ || "1"}" class="${active === "q" ? "on" : ""}"><i data-icon="book"></i><span>${t("q")}</span></button>
     <button data-go="#/caderno" class="${active === "caderno" ? "on" : ""}"><i data-icon="sticky-note"></i><span>${t("notebook")}</span></button>
+    <button type="button" class="tab-set" data-act="open-settings" title="${t("settings")}" aria-label="${t("settings")}"><i data-icon="settings"></i></button>
   </nav>`;
 }
 
@@ -819,7 +819,6 @@ function paintHome() {
   const hist = state.history.map((n) => state.byN.get(n)).filter(Boolean);
   return `<main class="page index">
       <div class="index-head">
-        <button class="iconbtn settings-corner" data-act="open-settings" title="${t("settings")}"><i data-icon="settings"></i></button>
         <h1 class="book-title">${t("book")}</h1>
         <p class="tagline">${t("study")}</p>
         <div class="index-actions">
