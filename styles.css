@@ -681,8 +681,11 @@ button.row {
   overscroll-behavior: none;
   touch-action: none;
 }
-.modal {
+.modal,
+.modal * {
   font-family: var(--sans);
+}
+.modal {
   width: min(420px, 92vw);
   max-width: 100%;
   min-height: 0;
