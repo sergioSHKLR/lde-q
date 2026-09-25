@@ -1,11 +1,11 @@
 :root {
-  --paper: #f4efe6;
+  --paper: #ffffff;
   --ink: #1c1916;
   --muted: #6b6258;
   --line: #ddd4c6;
   --card: #fbf7f0;
-  --accent: #c17f3e;
-  --star: #c17f3e;
+  --accent: #d4af37;
+  --star: #d4af37;
   --mark: #f3e08a;
   --safe-b: calc(5.5rem + env(safe-area-inset-bottom, 0px));
   --sans: "Quicksand", system-ui, "Segoe UI", sans-serif;
@@ -17,8 +17,8 @@ html[data-theme="dark"] {
   --muted: #b3a99b;
   --line: #3a342c;
   --card: #24211c;
-  --accent: #d4a06a;
-  --star: #d4a06a;
+  --accent: #e6c35c;
+  --star: #e6c35c;
   --mark: #6b5a1e;
 }
 * { box-sizing: border-box; }
@@ -292,7 +292,7 @@ html[data-theme="dark"] .note:focus {
   font-weight: 700;
   letter-spacing: .06em;
 }
-.onboard-brand .brand { color: #c17f3e; }
+.onboard-brand .brand { color: #d4af37; }
 .modal .kicker { margin-bottom: .2rem; }
 .modal [data-act="onboard-start"] {
   width: 100%;
@@ -595,7 +595,7 @@ button.row {
   justify-content: center;
   gap: .4rem;
 }
-.kicker .brand { color: #c17f3e; }
+.kicker .brand { color: #d4af37; }
 .toast {
   position: fixed;
   left: 50%;
