@@ -521,24 +521,58 @@ function paintQ(n) {
       </div>`
           : ``
       }
-      <div class="grifo-row">
+      <div class="grifo-row verbs">
         <button class="chip ${state.noteOpen ? "on" : ""}" data-act="toggle-note"><i data-icon="pencil"></i> ${t("note")}${note && !state.noteOpen ? " ·" : ""}</button>
         <span class="chip-side">${t("noteScope")}</span>
+        <button class="chip" data-act="comente"><i data-icon="message-circle"></i> ${t("comments")}</button>
+        <span class="chip-side">${t("commentsScope")}</span>
+        <button class="chip" data-act="share" title="${t("share")}"><i data-icon="share-2"></i> ${t("share")}</button>
       </div>
       ${
         state.noteOpen
           ? `<textarea class="note" id="note" data-act="note"${t("notePh") ? ` placeholder="${esc(t("notePh"))}"` : ""}>${esc(note)}</textarea>`
           : ""
       }
-      <aside class="comments" id="talk">
-        <div class="comments-head">
-          <button class="chip" data-act="comente"><i data-icon="message-circle"></i> ${t("comments")}</button>
-          <span class="chip-side">${t("commentsScope")}</span>
-          <button class="chip" data-act="share" title="${t("share")}"><i data-icon="share-2"></i> ${t("share")}</button>
-        </div>
-      </aside>
+      <aside class="comments" id="talk"></aside>
     </main>
     ${tabBar("q")}`;
+}
+
+function focusHyvor() {
+  const host = document.getElementById("talk") || document.querySelector("hyvor-talk-comments");
+  if (host) host.scrollIntoView({ behavior: "smooth", block: "center" });
+  const el = document.querySelector("hyvor-talk-comments");
+  const pick = (root) => {
+    if (!root || !root.querySelector) return null;
+    return (
+      root.querySelector('[contenteditable="true"]') ||
+      root.querySelector("textarea") ||
+      root.querySelector("[role=textbox]")
+    );
+  };
+  const walk = (node) => {
+    if (!node) return null;
+    const hit = pick(node) || (node.shadowRoot && pick(node.shadowRoot));
+    if (hit) return hit;
+    if (node.shadowRoot) {
+      const deep = walk(node.shadowRoot);
+      if (deep) return deep;
+    }
+    for (const child of node.children || []) {
+      const deep = walk(child);
+      if (deep) return deep;
+    }
+    return null;
+  };
+  const tryFocus = () => {
+    const box = walk(el);
+    if (box) {
+      box.focus();
+      return true;
+    }
+    return false;
+  };
+  if (!tryFocus()) setTimeout(tryFocus, 250);
 }
 
 function shareUrl(n) {
@@ -921,8 +955,7 @@ function onClick(e) {
     }
     if (a === "comente") {
       e.preventDefault();
-      const host = document.getElementById("talk");
-      if (host) host.scrollIntoView({ behavior: "smooth", block: "start" });
+      focusHyvor();
       return;
     }
     if (a === "toggle-note") {
