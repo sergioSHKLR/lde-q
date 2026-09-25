@@ -372,6 +372,13 @@ button.row {
 [data-icon] svg {
   display: block;
 }
+.iconbtn {
+  width: 2.2rem;
+  height: 2.2rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
 .iconbtn [data-icon] svg {
   width: 18px;
   height: 18px;

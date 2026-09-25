@@ -97,6 +97,7 @@ const ui = {
     searchHits: "questions",
     prev: "Previous",
     next: "Next",
+    showAnswers: "Show answers",
     hideAnswers: "Hide answers",
     answersHidden: "Answers hidden — sit with the question first.",
   },
@@ -121,7 +122,9 @@ function loadPref() {
   }
 }
 function savePref() {
-  localStorage.setItem(PREF_KEY, JSON.stringify(state.pref));
+  try {
+    localStorage.setItem(PREF_KEY, JSON.stringify(state.pref));
+  } catch {}
   applyTheme();
 }
 function loadMarks() {
@@ -646,11 +649,22 @@ function toggleFav(n) {
 
 function onClick(e) {
   const actEl = e.target.closest("[data-act]");
-  if (actEl && actEl.dataset.act === "fav-toggle") {
-    e.preventDefault();
-    e.stopPropagation();
-    toggleFav(actEl.dataset.n);
-    return;
+  if (actEl) {
+    const a = actEl.dataset.act;
+    if (a === "fav-toggle") {
+      e.preventDefault();
+      e.stopPropagation();
+      toggleFav(actEl.dataset.n);
+      return;
+    }
+    if (a === "answers") {
+      e.preventDefault();
+      e.stopPropagation();
+      state.pref.showAnswers = !state.pref.showAnswers;
+      savePref();
+      render();
+      return;
+    }
   }
   const goEl = e.target.closest("[data-go]");
   if (goEl && goEl.dataset.go) {
