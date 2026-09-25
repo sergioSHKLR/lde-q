@@ -453,10 +453,10 @@ function paintQ(n) {
         </button>
         <div class="qnum">${esc(q.label)}</div>
         <div class="tools">
-          <button class="iconbtn star ${fav ? "on" : ""}" data-act="fav" title="${t("fav")}">${iconStar(fav)}</button>
           <button class="iconbtn" data-act="answers" title="${shown ? t("hideAnswers") : t("showAnswers")}">
             <i data-icon="${shown ? "eye" : "eye-off"}"></i>
           </button>
+          <button class="iconbtn star ${fav ? "on" : ""}" data-act="fav" title="${t("fav")}">${iconStar(fav)}</button>
           <button class="iconbtn" data-act="share" title="${t("share")}">
             <i data-icon="share-2"></i>
           </button>
