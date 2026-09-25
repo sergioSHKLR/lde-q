@@ -52,7 +52,8 @@ const ui = {
     langOff: "EN-US quando o catálogo inglês existir",
     spirit: "Espíritos",
     kardec: "Kardec",
-    note: "Anote (privada)",
+    note: "Anote",
+    noteScope: "privada",
     notePh: "",
     notebook: "Caderno",
     fav: "Favoritas",
@@ -64,10 +65,11 @@ const ui = {
     emptyFav: "Ainda sem favoritas. Toca na estrela.",
     emptyMarks: "Ainda sem grifos.",
     emptyAll: "O caderno está vazio.",
-    comments: "Comente (público)",
+    comments: "Comente",
+    commentsScope: "público",
     shareFail: "Copia o endereço da questão para partilhar.",
     copied: "Ligação copiada",
-    share: "Compartilhar",
+    share: "Compartilhe",
     export: "Exportar caderno",
     import: "Importar caderno",
     highlightHint: "Selecione texto, escolha cor e clique Grifar",
@@ -122,9 +124,11 @@ const ui = {
     langOff: "EN-US when the English catalog exists",
     spirit: "Spirits",
     kardec: "Kardec",
-    note: "Note (private)",
+    note: "Note",
+    noteScope: "private",
     notePh: "",
-    comments: "Comment (public)",
+    comments: "Comment",
+    commentsScope: "public",
     notebook: "Notebook",
     fav: "Favorites",
     allMarks: "All",
@@ -135,7 +139,8 @@ const ui = {
     emptyFav: "No favorites yet. Tap the star.",
     emptyMarks: "No highlights yet.",
     emptyAll: "The notebook is empty.",
-    comments: "Comment (public)",
+    comments: "Comment",
+    commentsScope: "public",
     shareFail: "Copy the question URL to share.",
     copied: "Link copied",
     share: "Share",
@@ -518,6 +523,7 @@ function paintQ(n) {
       }
       <div class="grifo-row">
         <button class="chip ${state.noteOpen ? "on" : ""}" data-act="toggle-note"><i data-icon="pencil"></i> ${t("note")}${note && !state.noteOpen ? " ·" : ""}</button>
+        <span class="chip-side">${t("noteScope")}</span>
       </div>
       ${
         state.noteOpen
@@ -526,7 +532,8 @@ function paintQ(n) {
       }
       <aside class="comments" id="talk">
         <div class="comments-head">
-          <div class="hint">${t("comments")}</div>
+          <button class="chip" data-act="comente"><i data-icon="message-circle"></i> ${t("comments")}</button>
+          <span class="chip-side">${t("commentsScope")}</span>
           <button class="chip" data-act="share" title="${t("share")}"><i data-icon="share-2"></i> ${t("share")}</button>
         </div>
         <p class="legal-inline">${t("commentPublic")} <a href="${LEGAL_URL}" target="_blank" rel="noopener">${t("legal")}</a>.</p>
@@ -911,6 +918,12 @@ function onClick(e) {
       }
       const x = actEl;
       if (x) x.hidden = true;
+      return;
+    }
+    if (a === "comente") {
+      e.preventDefault();
+      const host = document.getElementById("talk");
+      if (host) host.scrollIntoView({ behavior: "smooth", block: "start" });
       return;
     }
     if (a === "toggle-note") {

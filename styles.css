@@ -582,6 +582,11 @@ button.swatch.on { outline: 2px solid var(--ink); outline-offset: 2px; }
   gap: .4rem;
   margin: .35rem 0 .8rem;
 }
+.chip-side {
+  font-family: var(--sans);
+  font-size: .72rem;
+  color: var(--muted);
+}
 .swatch-chip { gap: .4rem; }
 .color-labels { display: grid; gap: .45rem; margin: 0 0 .8rem; }
 .color-label {
