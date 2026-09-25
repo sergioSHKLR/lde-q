@@ -348,8 +348,8 @@ function paintHome() {
         <h1 class="book-title">${t("book")}</h1>
         <p class="tagline">${t("study")}</p>
         <div class="index-actions">
-          <button class="chip ${state.panel === "history" ? "on" : ""}" data-act="panel-history"><i data-icon="history"></i> ${t("history")}</button>
           <button class="chip ${state.panel === "search" ? "on" : ""}" data-act="panel-search"><i data-icon="search"></i> ${t("searchBtn")}</button>
+          <button class="chip ${state.panel === "history" ? "on" : ""}" data-act="panel-history"><i data-icon="history"></i> ${t("history")}</button>
         </div>
         ${
           state.panel === "history"
