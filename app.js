@@ -8,7 +8,6 @@ const GRIFO = [
   { id: "green", hex: "#b7e0b4", labelPt: "Verde", labelEn: "Green" },
   { id: "blue", hex: "#b4d4f0", labelPt: "Azul", labelEn: "Blue" },
   { id: "rose", hex: "#f0c0c8", labelPt: "Rosa", labelEn: "Rose" },
-  { id: "violet", hex: "#d4c0f0", labelPt: "Lilás", labelEn: "Violet" },
 ];
 const GRIFO_IDS = GRIFO.map((c) => c.id);
 const MARKS_KEY = "lde-q-marks-v1";
@@ -706,13 +705,14 @@ function settingsModal() {
         <button class="chip ${theme === "dark" ? "on" : ""}" data-act="theme-set" data-theme="dark">${t("themeDark")}</button>
       </div>
       <p class="hint">${t("langLabel")}</p>
-      <button class="lang" data-act="lang" data-off="${enOn ? "0" : "1"}" ${enOn ? "" : "disabled"} title="${t("langOff")}">
-        <i data-icon="lang-pt" data-icon-size="16"></i><span>/</span><i data-icon="lang-en" data-icon-size="16"></i>
-      </button>
+      <div class="filters">
+        <button class="chip ${state.pref.locale === "en-US" ? "" : "on"}" data-act="lang-set" data-lang="pt-BR">PT-BR</button>
+        <button class="chip ${state.pref.locale === "en-US" ? "on" : ""}" data-act="lang-set" data-lang="en-US" ${enOn ? "" : "disabled"} title="${t("langOff")}">EN-US</button>
+      </div>
       <p class="hint">${t("answersDefault")}</p>
       <div class="filters">
-        <button class="chip ${state.pref.showAnswers ? "" : "on"}" data-act="answers-set" data-on="0">${t("hideAnswers")}</button>
         <button class="chip ${state.pref.showAnswers ? "on" : ""}" data-act="answers-set" data-on="1">${t("showAnswers")}</button>
+        <button class="chip ${state.pref.showAnswers ? "" : "on"}" data-act="answers-set" data-on="0">${t("hideAnswers")}</button>
       </div>
       <p class="hint">${t("grifoColors")}</p>
       <div class="color-labels">
@@ -855,7 +855,16 @@ function onClick(e) {
       render();
       return;
     }
-    if (a === "theme-set") {
+    if (a === "lang-set") {
+      e.preventDefault();
+      if (actEl.disabled || actEl.getAttribute("disabled") !== null) return;
+      const lang = actEl.dataset.lang;
+      if (lang === "en-US" && !state.data?.enReady) return;
+      state.pref.locale = lang === "en-US" ? "en-US" : "pt-BR";
+      savePref();
+      render();
+      return;
+    }
       e.preventDefault();
       state.pref.theme = actEl.dataset.theme || "system";
       savePref();

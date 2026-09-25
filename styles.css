@@ -348,6 +348,12 @@ button.row {
   line-height: 1.2;
 }
 .chip.on { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+.chip:disabled, .chip[disabled] {
+  opacity: .4;
+  cursor: not-allowed;
+  background: var(--line);
+  color: var(--muted);
+}
 .tabbar {
   position: fixed; left: 0; right: 0; bottom: 0;
   display: grid; grid-template-columns: repeat(3, 1fr);
