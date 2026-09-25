@@ -44,6 +44,8 @@ const ui = {
     search: "Buscar questões…",
     searchEmpty: "Nada encontrado.",
     searchHits: "questões",
+    prev: "Anterior",
+    next: "Seguinte",
     showAnswers: "Mostrar respostas",
     hideAnswers: "Ocultar respostas",
     answersHidden: "Respostas ocultas — estuda a pergunta primeiro.",
@@ -88,7 +90,8 @@ const ui = {
     search: "Search questions…",
     searchEmpty: "Nothing found.",
     searchHits: "questions",
-    showAnswers: "Show answers",
+    prev: "Previous",
+    next: "Next",
     hideAnswers: "Hide answers",
     answersHidden: "Answers hidden — sit with the question first.",
   },
@@ -359,6 +362,9 @@ function paintQ(n) {
   return `${topBar(crumbsFor(q))}
     <main class="page">
       <div class="qhead">
+        <button class="iconbtn" data-go="${q.prev ? `#/q/${q.prev}` : ""}" ${q.prev ? "" : "disabled"} title="${t("prev")}">
+          <i data-icon="chevron-left"></i>
+        </button>
         <div class="qnum">${esc(q.label)}</div>
         <div class="tools">
           <button class="iconbtn star ${fav ? "on" : ""}" data-act="fav" title="${t("fav")}">${iconStar(fav)}</button>
@@ -367,6 +373,9 @@ function paintQ(n) {
           </button>
           <button class="iconbtn" data-act="share" title="Share"><i data-icon="share-2"></i></button>
         </div>
+        <button class="iconbtn" data-go="${q.next ? `#/q/${q.next}` : ""}" ${q.next ? "" : "disabled"} title="${t("next")}">
+          <i data-icon="chevron-right"></i>
+        </button>
       </div>
       <h1 class="prompt">${esc(c.prompt || "")}</h1>
       ${
@@ -377,10 +386,6 @@ function paintQ(n) {
       <button class="chip" data-act="highlight"><i data-icon="highlighter"></i> ${t("highlight")}</button>`
           : ``
       }
-      <div class="qnav">
-        <button data-go="${q.prev ? `#/q/${q.prev}` : ""}" ${q.prev ? "" : "disabled"}><i data-icon="chevron-left"></i>${q.prev ? " Q." + pretty(q.prev) : ""}</button>
-        <button data-go="${q.next ? `#/q/${q.next}` : ""}" ${q.next ? "" : "disabled"}>Q.${q.next ? pretty(q.next) : ""} <i data-icon="chevron-right"></i></button>
-      </div>
       <label class="hint" for="note">${t("note")}</label>
       <textarea class="note" id="note" data-act="note" placeholder="${t("notePh")}">${esc(note)}</textarea>
       <aside class="comments" id="talk">

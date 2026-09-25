@@ -130,11 +130,19 @@ h1 {
 }
 .page { padding: .7rem .95rem 1.4rem; }
 .qhead {
-  display: flex;
+  display: grid;
+  grid-template-columns: 2rem minmax(0, 1fr) auto 2rem;
   align-items: center;
-  justify-content: space-between;
-  gap: .5rem;
+  gap: .15rem;
+  position: sticky;
+  top: 2.8rem;
+  z-index: 4;
+  margin: 0 -.2rem;
+  padding: .15rem .2rem .35rem;
+  background: var(--paper);
 }
+.qhead .qnum { min-width: 0; }
+.qhead .iconbtn[disabled] { opacity: .28; cursor: default; }
 .qnum {
   font-size: 1.15rem;
   margin: 0;
@@ -240,6 +248,7 @@ button.row {
   margin: 0;
   width: 100%;
 }
+.search-wrap {
   display: flex;
   align-items: center;
   gap: .45rem;
