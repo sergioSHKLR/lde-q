@@ -1,0 +1,22 @@
+.settings-cluster {
+  display: inline-flex;
+  align-items: center;
+  gap: .32rem;
+}
+.settings-cluster.settings-corner {
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: 2;
+}
+.led {
+  width: .5rem;
+  height: .5rem;
+  border-radius: 999px;
+  flex: 0 0 auto;
+  background: #c62828;
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--ink) 18%, transparent);
+}
+.led.on {
+  background: #2e7d32;
+}
