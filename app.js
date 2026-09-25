@@ -806,12 +806,14 @@ function onClick(e) {
       if (x) x.hidden = true;
       return;
     }
+    if (a === "answers-set") {
       e.preventDefault();
       state.pref.showAnswers = actEl.dataset.on === "1";
       savePref();
       render();
       return;
     }
+    if (a === "theme-set") {
       e.preventDefault();
       state.pref.theme = actEl.dataset.theme || "system";
       savePref();
