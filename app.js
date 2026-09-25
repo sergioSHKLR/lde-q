@@ -545,7 +545,7 @@ function paintHome() {
         ${
           state.panel === "history"
             ? `<label class="search-wrap">
-          <input class="search" data-act="hist-filter" value="${esc(state.histFilter)}" placeholder="${t("filter")}" />
+          <input class="search" id="hist-filter" name="hist-filter" data-act="hist-filter" value="${esc(state.histFilter)}" placeholder="${t("filter")}" />
           ${state.histFilter ? `<button class="clear" type="button" data-act="clear-hist" aria-label="Limpar">×</button>` : ""}
         </label>
         <div class="history">${
@@ -563,7 +563,7 @@ function paintHome() {
         }</div>`
             : state.panel === "search"
               ? `<label class="search-wrap">
-          <input class="search" data-act="search" value="${esc(state.qSearch)}" placeholder="${t("search")}" />
+          <input class="search" id="q-search" name="q-search" data-act="search" value="${esc(state.qSearch)}" placeholder="${t("search")}" />
           ${state.qSearch ? `<button class="clear" type="button" data-act="clear-search" aria-label="Limpar">×</button>` : ""}
           <i data-icon="search"></i>
         </label>`
@@ -671,7 +671,7 @@ function paintQ(n) {
       </div>
       ${
         state.noteOpen
-          ? `<textarea class="note" id="note" data-act="note"${t("notePh") ? ` placeholder="${esc(t("notePh"))}"` : ""}>${esc(note)}</textarea>`
+          ? `<textarea class="note" id="note" name="note" data-act="note"${t("notePh") ? ` placeholder="${esc(t("notePh"))}"` : ""}>${esc(note)}</textarea>`
           : ""
       }
       <div class="verb-social">
@@ -794,7 +794,7 @@ function paintList(filter) {
           : ""
       }
       <label class="search-wrap">
-        <input class="search" data-act="filter" placeholder="${t("filter")}" />
+        <input class="search" id="caderno-filter" name="caderno-filter" data-act="filter" placeholder="${t("filter")}" />
         <button class="clear" type="button" data-act="clear-filter" hidden aria-label="Limpar">×</button>
       </label>
       <div class="list" data-list="caderno">
@@ -815,7 +815,7 @@ function paintList(filter) {
             : ""
         }
         <button class="chip" data-act="export">${t("export")}</button>
-        <label class="chip"><input type="file" accept="application/json" hidden data-act="import" />${t("import")}</label>
+        <label class="chip"><input type="file" id="caderno-import" name="caderno-import" accept="application/json" hidden data-act="import" />${t("import")}</label>
       </div>`
             : ""
         }
@@ -955,7 +955,7 @@ function settingsModal() {
       </div>
       <p class="hint">${t("grifoColors")}</p>
       <div class="color-labels">
-        ${GRIFO.map((c) => `<label class="color-label"><span class="swatch" style="--sw:${c.hex}"></span><input data-act="color-label" data-color="${c.id}" value="${esc(colorLabel(c.id))}" /></label>`).join("")}
+        ${GRIFO.map((c) => `<label class="color-label"><span class="swatch" style="--sw:${c.hex}"></span><input id="grifo-${c.id}" name="grifo-${c.id}" data-act="color-label" data-color="${c.id}" value="${esc(colorLabel(c.id))}" /></label>`).join("")}
       </div>
       <p class="hint">${t("hyvorAccount")}</p>
       ${profile}
