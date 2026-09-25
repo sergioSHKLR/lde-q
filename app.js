@@ -865,6 +865,7 @@ function onClick(e) {
       render();
       return;
     }
+    if (a === "theme-set") {
       e.preventDefault();
       state.pref.theme = actEl.dataset.theme || "system";
       savePref();
