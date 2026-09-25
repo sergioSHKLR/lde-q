@@ -819,10 +819,14 @@ function indexByParte() {
 function paintHome() {
   const groups = indexByParte();
   const hist = state.history.map((n) => state.byN.get(n)).filter(Boolean);
-  return `<main class="page index">
+  return `<header class="brand">
+      <div class="brand-mark" aria-hidden="true"><i data-icon="sparkles"></i></div>
+      <h1>LDE-Q</h1>
+      <p>${t("study")}</p>
+    </header>
+    <main class="page index">
       <div class="index-head">
-        <h1 class="book-title">${t("book")}</h1>
-        <p class="tagline">${t("study")}</p>
+        <h2 class="book-title">${t("book")}</h2>
         <div class="index-actions">
           <button class="chip ${state.panel === "search" ? "on" : ""}" data-act="panel-search"><i data-icon="search"></i> ${t("searchBtn")}</button>
           <button class="chip ${state.panel === "history" ? "on" : ""}" data-act="panel-history"><i data-icon="history"></i> ${t("history")}</button>
