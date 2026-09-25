@@ -79,6 +79,11 @@ const ui = {
     fileLinked: "Fora do app. Sobrevive a desinstalar.",
     fileUnsupported: "Este navegador não guarda arquivo fora do app. Use Exportar.",
     fileSection: "Arquivo",
+    driveIn: "Entrar no Drive",
+    driveOut: "Sair do Drive",
+    driveOn: "Drive ligado. Os aparelhos juntam o caderno.",
+    driveOff: "Drive desligado.",
+    driveErr: "Drive não ligou. Confere a origem https://lde.doutrina.org no cliente.",
     highlightHint: "Escolha cor, selecione texto e clique Grifar",
     highlight: "Grifar",
     grifoColors: "Cores do grifo",
@@ -164,6 +169,11 @@ const ui = {
     fileLinked: "Outside the app. Survives uninstall.",
     fileUnsupported: "This browser cannot keep a file outside the app. Use Export.",
     fileSection: "File",
+    driveIn: "Sign in to Drive",
+    driveOut: "Sign out of Drive",
+    driveOn: "Drive is on. Devices merge the notebook.",
+    driveOff: "Drive is off.",
+    driveErr: "Drive did not connect. Check the origin https://lde.doutrina.org on the client.",
     highlightHint: "Pick a color, select text, then tap Highlight",
     highlight: "Highlight",
     grifoColors: "Highlight colors",
@@ -223,14 +233,15 @@ function savePref() {
 function loadMarks() {
   try {
     const m = JSON.parse(localStorage.getItem(MARKS_KEY) || "{}");
-    return { v: 1, favs: [], highlights: {}, notes: {}, ...m };
+    return normalizeMarks(m);
   } catch {
-    return { v: 1, favs: [], highlights: {}, notes: {} };
+    return blankMarks();
   }
 }
 function saveMarks() {
   localStorage.setItem(MARKS_KEY, JSON.stringify(state.marks));
   scheduleFileWrite();
+  if (!driveApplying) scheduleDrivePush();
 }
 let fileTimer = 0;
 function scheduleFileWrite() {
@@ -267,7 +278,7 @@ async function idbGetHandle() {
   });
 }
 function applyMarks(data) {
-  state.marks = { v: 1, favs: [], highlights: {}, notes: {}, ...data };
+  state.marks = normalizeMarks(data);
   localStorage.setItem(MARKS_KEY, JSON.stringify(state.marks));
 }
 async function writeCadernoFile() {
@@ -355,6 +366,267 @@ async function restoreCadernoFile() {
     }
     await readCadernoFile();
   } catch {}
+}
+
+const DRIVE_CLIENT_ID = "27305000935-rndbgm4d2um522jkgr2odqr9ien35kuq.apps.googleusercontent.com";
+const DRIVE_SCOPE = "https://www.googleapis.com/auth/drive.file";
+const DRIVE_OK_KEY = "lde-q-drive-ok";
+const DRIVE_FOLDER_KEY = "lde-q-drive-folder";
+const DRIVE_FILE_KEY = "lde-q-drive-file";
+let driveToken = "";
+let driveBusy = false;
+let driveQueued = false;
+let driveTimer = 0;
+let driveApplying = false;
+let tokenClient = null;
+
+function blankMarks() {
+  return { v: 1, favs: [], highlights: {}, notes: {}, meta: { fav: {}, hi: {}, note: {} } };
+}
+function normalizeMarks(m) {
+  const out = blankMarks();
+  if (!m || typeof m !== "object") return out;
+  out.favs = Array.isArray(m.favs) ? m.favs.map(String) : [];
+  out.highlights = m.highlights && typeof m.highlights === "object" ? m.highlights : {};
+  out.notes = m.notes && typeof m.notes === "object" ? m.notes : {};
+  const meta = m.meta || {};
+  out.meta.fav = meta.fav && typeof meta.fav === "object" ? meta.fav : {};
+  out.meta.hi = meta.hi && typeof meta.hi === "object" ? meta.hi : {};
+  out.meta.note = meta.note && typeof meta.note === "object" ? meta.note : {};
+  return out;
+}
+function ensureMeta() {
+  state.marks = normalizeMarks(state.marks);
+}
+function mergeMarks(remote, local) {
+  const a = normalizeMarks(remote);
+  const b = normalizeMarks(local);
+  const out = blankMarks();
+  const favIds = new Set([
+    ...a.favs,
+    ...b.favs,
+    ...Object.keys(a.meta.fav),
+    ...Object.keys(b.meta.fav),
+  ]);
+  favIds.forEach((n) => {
+    const left = a.meta.fav[n] || { on: a.favs.includes(n), at: 0 };
+    const right = b.meta.fav[n] || { on: b.favs.includes(n), at: 0 };
+    const win = (right.at || 0) >= (left.at || 0) ? right : left;
+    out.meta.fav[n] = { on: !!win.on, at: win.at || 0 };
+    if (win.on) out.favs.push(n);
+  });
+  const hiIds = new Set([
+    ...Object.keys(a.highlights),
+    ...Object.keys(b.highlights),
+    ...Object.keys(a.meta.hi),
+    ...Object.keys(b.meta.hi),
+  ]);
+  hiIds.forEach((n) => {
+    const la = a.meta.hi[n] && a.meta.hi[n].at ? a.meta.hi[n].at : 0;
+    const lb = b.meta.hi[n] && b.meta.hi[n].at ? b.meta.hi[n].at : 0;
+    let items;
+    if (!la && !lb) {
+      const seen = new Set();
+      items = [...(a.highlights[n] || []), ...(b.highlights[n] || [])].filter((h) => {
+        const key = (h && h.text) || "";
+        if (!key || seen.has(key)) return false;
+        seen.add(key);
+        return true;
+      });
+    } else items = lb >= la ? b.highlights[n] || [] : a.highlights[n] || [];
+    if (items.length) out.highlights[n] = items;
+    const at = Math.max(la, lb);
+    if (at) out.meta.hi[n] = { at };
+  });
+  const noteIds = new Set([
+    ...Object.keys(a.notes),
+    ...Object.keys(b.notes),
+    ...Object.keys(a.meta.note),
+    ...Object.keys(b.meta.note),
+  ]);
+  noteIds.forEach((n) => {
+    const la = a.meta.note[n] && a.meta.note[n].at ? a.meta.note[n].at : 0;
+    const lb = b.meta.note[n] && b.meta.note[n].at ? b.meta.note[n].at : 0;
+    const text = lb >= la ? b.notes[n] : a.notes[n];
+    if (text) out.notes[n] = text;
+    const at = Math.max(la, lb);
+    if (at) out.meta.note[n] = { at };
+  });
+  return out;
+}
+function loadGis() {
+  return new Promise((resolve, reject) => {
+    if (window.google && google.accounts && google.accounts.oauth2) return resolve();
+    const s = document.createElement("script");
+    s.src = "https://accounts.google.com/gsi/client";
+    s.async = true;
+    s.onload = () => resolve();
+    s.onerror = () => reject(new Error("gis"));
+    document.head.appendChild(s);
+  });
+}
+async function driveFetch(url, opts) {
+  const res = await fetch(url, {
+    ...(opts || {}),
+    headers: { Authorization: "Bearer " + driveToken, ...((opts && opts.headers) || {}) },
+  });
+  if (res.status === 401) {
+    driveToken = "";
+    const err = new Error("drive 401");
+    err.status = 401;
+    throw err;
+  }
+  if (!res.ok) {
+    const err = new Error("drive " + res.status);
+    err.status = res.status;
+    throw err;
+  }
+  if (res.status === 204) return null;
+  const ct = res.headers.get("content-type") || "";
+  if (ct.includes("json")) return res.json();
+  return res.text();
+}
+async function driveFind(q) {
+  const data = await driveFetch(
+    "https://www.googleapis.com/drive/v3/files?pageSize=10&fields=files(id,name)&spaces=drive&q=" + encodeURIComponent(q)
+  );
+  return (data.files || [])[0] || null;
+}
+async function ensureDriveFile() {
+  let folderId = localStorage.getItem(DRIVE_FOLDER_KEY) || "";
+  if (folderId) {
+    try {
+      await driveFetch("https://www.googleapis.com/drive/v3/files/" + encodeURIComponent(folderId) + "?fields=id,trashed");
+    } catch {
+      folderId = "";
+      localStorage.removeItem(DRIVE_FOLDER_KEY);
+    }
+  }
+  if (!folderId) {
+    const found = await driveFind("name='LDE-Q' and mimeType='application/vnd.google-apps.folder' and trashed=false");
+    if (found) folderId = found.id;
+    else {
+      const created = await driveFetch("https://www.googleapis.com/drive/v3/files", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: "LDE-Q", mimeType: "application/vnd.google-apps.folder" }),
+      });
+      folderId = created.id;
+    }
+    localStorage.setItem(DRIVE_FOLDER_KEY, folderId);
+  }
+  let fileId = localStorage.getItem(DRIVE_FILE_KEY) || "";
+  if (fileId) {
+    try {
+      await driveFetch("https://www.googleapis.com/drive/v3/files/" + encodeURIComponent(fileId) + "?fields=id,trashed");
+    } catch {
+      fileId = "";
+      localStorage.removeItem(DRIVE_FILE_KEY);
+    }
+  }
+  if (!fileId) {
+    const found = await driveFind("name='lde-q.json' and '" + folderId + "' in parents and trashed=false");
+    if (found) fileId = found.id;
+    else fileId = await uploadDriveJson("", folderId, state.marks);
+    localStorage.setItem(DRIVE_FILE_KEY, fileId);
+  }
+  return fileId;
+}
+async function uploadDriveJson(fileId, folderId, marks) {
+  const body = JSON.stringify(marks);
+  if (fileId) {
+    await driveFetch(
+      "https://www.googleapis.com/upload/drive/v3/files/" + encodeURIComponent(fileId) + "?uploadType=media",
+      { method: "PATCH", headers: { "Content-Type": "application/json" }, body }
+    );
+    return fileId;
+  }
+  const boundary = "ldeq" + Date.now();
+  const meta = { name: "lde-q.json", mimeType: "application/json", parents: [folderId] };
+  const mixed =
+    "--" + boundary + "\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n" +
+    JSON.stringify(meta) +
+    "\r\n--" + boundary + "\r\nContent-Type: application/json\r\n\r\n" +
+    body +
+    "\r\n--" + boundary + "--";
+  const created = await driveFetch(
+    "https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id",
+    { method: "POST", headers: { "Content-Type": "multipart/related; boundary=" + boundary }, body: mixed }
+  );
+  return created.id;
+}
+async function pullAndMerge(andPush) {
+  if (!driveToken || driveBusy) return;
+  if (document.activeElement && document.activeElement.dataset && document.activeElement.dataset.act === "note") return;
+  driveBusy = true;
+  try {
+    const id = await ensureDriveFile();
+    let remote = blankMarks();
+    try {
+      remote = normalizeMarks(await driveFetch("https://www.googleapis.com/drive/v3/files/" + encodeURIComponent(id) + "?alt=media"));
+    } catch (err) {
+      if (!err || err.status !== 404) throw err;
+    }
+    const merged = mergeMarks(remote, state.marks);
+    driveApplying = true;
+    state.marks = merged;
+    localStorage.setItem(MARKS_KEY, JSON.stringify(state.marks));
+    driveApplying = false;
+    if (andPush) await uploadDriveJson(id, "", merged);
+    render();
+  } catch (err) {
+    driveApplying = false;
+    if (!err || err.status !== 401) toast(t("driveErr"));
+  } finally {
+    driveBusy = false;
+    if (driveQueued) {
+      driveQueued = false;
+      scheduleDrivePush();
+    }
+  }
+}
+function scheduleDrivePush() {
+  if (!driveToken) return;
+  clearTimeout(driveTimer);
+  driveTimer = setTimeout(() => {
+    if (driveBusy) {
+      driveQueued = true;
+      return;
+    }
+    pullAndMerge(true);
+  }, 900);
+}
+async function connectDrive(silent) {
+  try {
+    await loadGis();
+    if (!tokenClient) {
+      tokenClient = google.accounts.oauth2.initTokenClient({
+        client_id: DRIVE_CLIENT_ID,
+        scope: DRIVE_SCOPE,
+        callback: () => {},
+      });
+    }
+    tokenClient.callback = (resp) => {
+      if (!resp || resp.error || !resp.access_token) {
+        if (!silent) toast(t("driveErr"));
+        return;
+      }
+      driveToken = resp.access_token;
+      localStorage.setItem(DRIVE_OK_KEY, "1");
+      pullAndMerge(true);
+    };
+    tokenClient.requestAccessToken({ prompt: silent ? "" : "" });
+  } catch {
+    if (!silent) toast(t("driveErr"));
+  }
+}
+function signOutDrive() {
+  const token = driveToken;
+  driveToken = "";
+  localStorage.removeItem(DRIVE_OK_KEY);
+  if (token && window.google && google.accounts && google.accounts.oauth2)
+    google.accounts.oauth2.revoke(token, () => {});
+  render();
 }
 function loadHistory() {
   try {
@@ -812,12 +1084,13 @@ function paintList(filter) {
       </div>
       <section class="arquivo ${state.filePanel ? "open" : ""}">
         <button class="arquivo-head" data-act="toggle-file">
-          <span><strong>${t("fileSection")}</strong><small>${fileStatus}</small></span>
+          <span><strong>${t("fileSection")}</strong><small>${fileStatus}<br>${driveToken ? t("driveOn") : t("driveOff")}</small></span>
           <i data-icon="chevron-right"></i>
         </button>
         ${
           state.filePanel
             ? `<div class="index-actions">
+        <button class="chip" data-act="${driveToken ? "drive-out" : "drive-in"}">${driveToken ? t("driveOut") : t("driveIn")}</button>
         ${
           canFile
             ? `<button class="chip" data-act="file-save">${t("fileSave")}</button>
@@ -1095,9 +1368,12 @@ function render() {
 function toggleFav(n) {
   if (!n) return;
   const set = new Set(state.marks.favs);
-  if (set.has(n)) set.delete(n);
-  else set.add(n);
+  const on = !set.has(n);
+  if (on) set.add(n);
+  else set.delete(n);
   state.marks.favs = [...set];
+  ensureMeta();
+  state.marks.meta.fav[String(n)] = { on, at: Date.now() };
   saveMarks();
   render();
 }
@@ -1311,8 +1587,18 @@ function onClick(e) {
     const arr = state.marks.highlights[r.n] || [];
     if (!arr.some((h) => h.text === text)) arr.push({ text, color: colorId(state.pref.grifoColor) });
     state.marks.highlights[r.n] = arr;
+    ensureMeta();
+    state.marks.meta.hi[r.n] = { at: Date.now() };
     saveMarks();
     render();
+  }
+  if (a === "drive-in") {
+    connectDrive(false);
+    return;
+  }
+  if (a === "drive-out") {
+    signOutDrive();
+    return;
   }
   if (a === "toggle-file") {
     e.preventDefault();
@@ -1346,7 +1632,18 @@ function onChange(e) {
     const f = e.target.files[0];
     f.text().then((txt) => {
       const data = JSON.parse(txt);
-      state.marks = { v: 1, favs: [], highlights: {}, notes: {}, ...data };
+      state.marks = normalizeMarks(data);
+      const now = Date.now();
+      ensureMeta();
+      state.marks.favs.forEach((n) => {
+        state.marks.meta.fav[n] = { on: true, at: now };
+      });
+      Object.keys(state.marks.highlights).forEach((n) => {
+        state.marks.meta.hi[n] = { at: now };
+      });
+      Object.keys(state.marks.notes).forEach((n) => {
+        state.marks.meta.note[n] = { at: now };
+      });
       saveMarks();
       render();
     });
@@ -1358,6 +1655,8 @@ function onInput(e) {
     const r = parseHash();
     if (r.name !== "q") return;
     state.marks.notes[r.n] = e.target.value;
+    ensureMeta();
+    state.marks.meta.note[r.n] = { at: Date.now() };
     saveMarks();
   }
   if (e.target.dataset.act === "search") {
@@ -1451,6 +1750,10 @@ async function boot() {
     root.addEventListener("keydown", onKey);
     window.addEventListener("hashchange", render);
     render();
+    if (localStorage.getItem(DRIVE_OK_KEY) === "1") connectDrive(true);
+    document.addEventListener("visibilitychange", () => {
+      if (document.visibilityState === "visible" && driveToken) pullAndMerge(false);
+    });
     if (location.protocol === "https:" && "serviceWorker" in navigator) {
       navigator.serviceWorker.register("sw.js").catch(() => {});
     }
