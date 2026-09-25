@@ -34,7 +34,7 @@ button, input, textarea {
 button, input, textarea, label, .tabbar, .top, .pill, .chip, .lang, .kicker, .qnum, .filters, .row small, .sub {
   font-family: var(--sans);
 }
-.prompt, .block p, .note {
+.prompt, .block p, .note, .book-title, .index-parte h2, .row strong, .page > h1 {
   font-family: var(--serif);
 }
 a { color: var(--accent); text-decoration: none; }
@@ -285,10 +285,10 @@ button.row {
   margin: .4rem 0 1.1rem;
 }
 .book-title {
-  font-family: var(--sans);
+  font-family: var(--serif);
   font-size: 1.85rem;
-  font-weight: 700;
-  letter-spacing: .02em;
+  font-weight: 600;
+  letter-spacing: 0;
   line-height: 1.15;
   margin: .2rem 0 0;
 }
@@ -300,12 +300,12 @@ button.row {
   justify-content: center;
 }
 .index-parte h2 {
-  font-family: var(--sans);
-  font-size: .78rem;
+  font-family: var(--serif);
+  font-size: 1.05rem;
   font-weight: 600;
-  letter-spacing: .08em;
-  text-transform: uppercase;
-  color: var(--muted);
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--ink);
   margin: 1.2rem 0 .45rem;
 }
 .index .list { margin-bottom: .3rem; }
