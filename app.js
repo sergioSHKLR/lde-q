@@ -327,6 +327,13 @@ function paintHome() {
     ${tabBar("home")}`;
 }
 
+function formatText(text, spans) {
+  let out = applyHighlights(text, spans);
+  out = out.replace(/\n/g, "<br>");
+  out = out.replace(/\*([^*]+)\*/g, "<em>$1</em>");
+  return out;
+}
+
 function applyHighlights(text, spans) {
   if (!spans || !spans.length) return esc(text);
   let out = esc(text);
@@ -346,8 +353,8 @@ function paintQ(n) {
   const fav = state.marks.favs.includes(n);
   const hs = state.marks.highlights[n] || [];
   const note = state.marks.notes[n] || "";
-  const spirit = (c.spirit || []).map((p) => `<p>${applyHighlights(p, hs)}</p>`).join("");
-  const kardec = (c.kardec || []).map((p) => `<p>${applyHighlights(p, hs)}</p>`).join("");
+  const spirit = (c.spirit || []).map((p) => `<p>${formatText(p, hs)}</p>`).join("");
+  const kardec = (c.kardec || []).map((p) => `<p>${formatText(p, hs)}</p>`).join("");
   const shown = !!state.pref.showAnswers;
   return `${topBar(crumbsFor(q))}
     <main class="page">
@@ -714,7 +721,7 @@ async function boot() {
   applyTheme();
   const root = document.getElementById("app");
   root.className = "app";
-  root.innerHTML = "<main class='home'><p class='sub'>A carregar…</p></main>";
+  root.innerHTML = "<main class='home'><p class='sub'>Carregando…</p></main>";
   try {
     const res = await fetch("data/questions.json");
     if (!res.ok) throw new Error("catalog " + res.status);
@@ -730,7 +737,7 @@ async function boot() {
       navigator.serviceWorker.register("sw.js").catch(() => {});
     }
   } catch (err) {
-    root.innerHTML = "<main class='home'><p>Falha a carregar o catálogo.</p><p class='sub'>" + String(err) + "</p></main>";
+    root.innerHTML = "<main class='home'><p>Falha ao carregar o catálogo.</p><p class='sub'>" + String(err) + "</p></main>";
   }
 }
 
