@@ -43,7 +43,6 @@ const ui = {
     onboardAnote: "Anote fica neste aparelho.",
     onboardComente: "Comente é público na internet (Hyvor).",
     onboardShare: "Compartilhe envia a questão.",
-    onboardEye: "O ícone de olho oculta ou mostra as respostas.",
     version: "Versão",
     hyvorAccount: "Perfil Hyvor",
     hyvorOff: "Abre uma questão e entra no Hyvor para ver o perfil aqui.",
@@ -122,7 +121,6 @@ const ui = {
     onboardAnote: "Notes stay on this device.",
     onboardComente: "Comments are public on the internet (Hyvor).",
     onboardShare: "Share sends the question.",
-    onboardEye: "The eye icon hides or shows the answers.",
     version: "Version",
     hyvorAccount: "Hyvor profile",
     hyvorOff: "Open a question and sign in to Hyvor to see the profile here.",
@@ -979,7 +977,6 @@ function onboardCard() {
         <li>${t("onboardAnote")}</li>
         <li>${t("onboardComente")}</li>
         <li>${t("onboardShare")}</li>
-        <li>${t("onboardEye")}</li>
       </ul>
       <button class="chip on" data-act="onboard-start">${t("onboardStart")}</button>
       <p class="legal-foot"><a href="${LEGAL_URL}" target="_blank" rel="noopener">${t("legalFoot")}</a></p>
