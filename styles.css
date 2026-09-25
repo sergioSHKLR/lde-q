@@ -266,7 +266,7 @@ button.row {
   padding: .55rem 0;
 }
 .search-wrap [data-icon] { color: var(--muted); flex: 0 0 auto; }
-[data-icon="search"] svg { transform: none; }
+[data-icon="search"] svg { transform: scaleX(-1); }
 .history {
   text-align: left;
   margin: .35rem 0 .6rem;
