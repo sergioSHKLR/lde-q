@@ -516,7 +516,9 @@ function paintQ(n) {
       </div>`
           : ``
       }
-      <button type="button" class="hint note-toggle" data-act="toggle-note">${t("note")}${note ? " ·" : ""}</button>
+      <div class="grifo-row">
+        <button class="chip ${state.noteOpen ? "on" : ""}" data-act="toggle-note"><i data-icon="pencil"></i> ${t("note")}${note && !state.noteOpen ? " ·" : ""}</button>
+      </div>
       ${
         state.noteOpen
           ? `<textarea class="note" id="note" data-act="note"${t("notePh") ? ` placeholder="${esc(t("notePh"))}"` : ""}>${esc(note)}</textarea>`
