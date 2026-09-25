@@ -128,6 +128,7 @@ h1 {
   border-radius: .7rem;
   background: var(--card);
 }
+.jump.show { display: block; margin: .7rem auto 0; }
 .page { padding: .7rem .95rem 1.4rem; }
 .qhead {
   display: grid;
@@ -264,8 +265,12 @@ button.row {
   background: transparent;
   padding: .55rem 0;
 }
-.search-wrap [data-icon] { color: var(--muted); }
-[data-icon="search"] svg { transform: scaleX(-1); }
+.search-wrap [data-icon] { color: var(--muted); flex: 0 0 auto; }
+[data-icon="search"] svg { transform: none; }
+.history {
+  text-align: left;
+  margin: .35rem 0 .6rem;
+}
 .tagline {
   font-family: var(--sans);
   font-size: .82rem;

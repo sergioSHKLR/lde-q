@@ -2,14 +2,16 @@ import { hydrateIcons } from "./icons.js";
 
 const HYVOR_WEBSITE_ID = "16128";
 const MARKS_KEY = "lde-q-marks-v1";
-const PREF_KEY = "lde-q-pref-v1";
+const HISTORY_KEY = "lde-q-history-v1";
 
 const ui = {
   "pt-BR": {
     book: "O Livro dos Espíritos",
     start: "Começar",
     resume: "Continuar",
-    jump: "Saltar…",
+    jump: "Ir para questão…",
+    history: "Histórico",
+    emptyHistory: "Ainda sem histórico.",
     emptyFav: "Ainda sem favoritas. Toca na estrela.",
     emptyMarks: "Ainda sem destaques nem notas.",
     qs: "questões",
@@ -54,7 +56,9 @@ const ui = {
     book: "The Spirits’ Book",
     start: "Start",
     resume: "Continue",
-    jump: "Jump…",
+    jump: "Go to question…",
+    history: "History",
+    emptyHistory: "No history yet.",
     emptyFav: "No favorites yet. Tap the star.",
     emptyMarks: "No highlights or notes yet.",
     qs: "questions",
@@ -103,6 +107,8 @@ const state = {
   marks: loadMarks(),
   pref: loadPref(),
   qSearch: "",
+  history: loadHistory(),
+  showHistory: false,
 };
 
 function loadPref() {
@@ -126,6 +132,22 @@ function loadMarks() {
 }
 function saveMarks() {
   localStorage.setItem(MARKS_KEY, JSON.stringify(state.marks));
+}
+function loadHistory() {
+  try {
+    const raw = JSON.parse(localStorage.getItem(HISTORY_KEY) || "[]");
+    return Array.isArray(raw) ? raw.map(String).filter(Boolean).slice(0, 20) : [];
+  } catch {
+    return [];
+  }
+}
+function saveHistory() {
+  localStorage.setItem(HISTORY_KEY, JSON.stringify(state.history.slice(0, 20)));
+}
+function rememberQ(n) {
+  if (!n) return;
+  state.history = [n, ...state.history.filter((x) => x !== n)].slice(0, 20);
+  saveHistory();
 }
 function t(key) {
   const loc = state.pref.locale === "en-US" ? "en-US" : "pt-BR";
@@ -278,22 +300,36 @@ function indexByParte() {
 }
 
 function paintHome() {
-  const last = state.lastQ && state.byN.has(state.lastQ) ? state.lastQ : "1";
-  const resume = last !== "1";
   const groups = indexByParte();
+  const hist = state.history.map((n) => state.byN.get(n)).filter(Boolean);
   return `<main class="page index">
       <div class="index-head">
         <div class="kicker"><i data-icon="sparkles" data-icon-size="22" class="brand"></i></div>
         <h1 class="book-title">${t("book")}</h1>
         <p class="tagline">${t("study")}</p>
         <div class="index-actions">
-          <button class="chip on" data-go="#/q/${last}">${resume ? t("resume") : t("start")} Q.${pretty(last)}</button>
-          <button class="chip" data-act="toggle-jump">${t("jump")}</button>
+          <button class="chip ${state.showHistory ? "on" : ""}" data-act="toggle-history"><i data-icon="history"></i> ${t("history")}</button>
         </div>
-        <input class="jump" id="jump" inputmode="text" placeholder="${t("jumpPh")}" />
+        ${
+          state.showHistory
+            ? `<div class="history">${
+                hist.length
+                  ? hist
+                      .map(
+                        (q) => `<button class="row" data-go="#/q/${q.n}">
+            <span class="n">${esc(pretty(q.n))}</span>
+            <span><strong>${esc(contentOf(q).prompt || q.label)}</strong></span>
+          </button>`
+                      )
+                      .join("")
+                  : `<p class="empty">${t("emptyHistory")}</p>`
+              }</div>`
+            : ""
+        }
+        <input class="jump show" id="jump" inputmode="text" placeholder="${t("jump")}" />
         <label class="search-wrap">
-          <i data-icon="search"></i>
           <input class="search" data-act="search" value="${esc(state.qSearch)}" placeholder="${t("search")}" />
+          <i data-icon="search"></i>
         </label>
       </div>
       ${
@@ -353,6 +389,7 @@ function paintQ(n) {
   const q = state.byN.get(n);
   if (!q) return paintHome();
   state.lastQ = n;
+  rememberQ(n);
   const c = contentOf(q);
   const fav = state.marks.favs.includes(n);
   const hs = state.marks.highlights[n] || [];
@@ -633,6 +670,11 @@ function onClick(e) {
     go("#/");
     return;
   }
+  if (a === "toggle-history") {
+    state.showHistory = !state.showHistory;
+    render();
+    return;
+  }
   if (a === "toggle-jump") {
     const el = document.getElementById("jump");
     if (!el) return;
@@ -733,6 +775,7 @@ async function boot() {
     if (!res.ok) throw new Error("catalog " + res.status);
     state.data = await res.json();
     for (const q of state.data.questions) state.byN.set(q.n, q);
+    state.lastQ = state.history.find((n) => state.byN.has(n)) || "1";
     root.addEventListener("click", onClick);
     root.addEventListener("change", onChange);
     root.addEventListener("input", onInput);
