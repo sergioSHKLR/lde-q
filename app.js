@@ -1,4 +1,4 @@
-import { hydrateIcons } from "./icons.js?v=box1";
+import { hydrateIcons } from "./icons.js?v=file1";
 
 const HYVOR_WEBSITE_ID = "16128";
 const APP_VERSION = "0.3.0";
@@ -1092,15 +1092,15 @@ function paintList(filter) {
         ${
           state.filePanel
             ? `<div class="index-actions">
-        <button class="chip" data-act="${driveToken ? "drive-out" : "drive-in"}">${driveToken ? t("driveOut") : t("driveIn")}</button>
+        <button class="chip" data-act="${driveToken ? "drive-out" : "drive-in"}"><i data-icon="${driveToken ? "log-out" : "log-in"}"></i> ${driveToken ? t("driveOut") : t("driveIn")}</button>
         ${
           canFile
-            ? `<button class="chip" data-act="file-save">${t("fileSave")}</button>
-        <button class="chip" data-act="${state.fileNeedsGrant ? "file-resume" : "file-open"}">${state.fileNeedsGrant ? t("fileResume") : t("fileOpen")}</button>`
+            ? `<button class="chip" data-act="file-save"><i data-icon="file-up"></i> ${t("fileSave")}</button>
+        <button class="chip" data-act="${state.fileNeedsGrant ? "file-resume" : "file-open"}"><i data-icon="folder"></i> ${state.fileNeedsGrant ? t("fileResume") : t("fileOpen")}</button>`
             : ""
         }
-        <button class="chip" data-act="export">${t("export")}</button>
-        <label class="chip"><input type="file" id="caderno-import" name="caderno-import" accept="application/json" hidden data-act="import" />${t("import")}</label>
+        <button class="chip" data-act="export"><i data-icon="file-down"></i> ${t("export")}</button>
+        <label class="chip"><i data-icon="file-up"></i><input type="file" id="caderno-import" name="caderno-import" accept="application/json" hidden data-act="import" />${t("import")}</label>
       </div>`
             : ""
         }
