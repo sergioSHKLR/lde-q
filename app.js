@@ -1120,7 +1120,7 @@ function rowHTML(q, opts = {}) {
     : fav
       ? `<span class="star on">${iconStar(true)}</span>`
       : `<span></span>`;
-  return `<div class="row">
+  return `<div class="row${fav ? " is-fav" : ""}">
     <button class="row-main" data-go="#/q/${q.n}">
       <span class="n">${esc(pretty(q.n))}</span>
       <span><strong>${esc(c.prompt || q.label)}</strong>

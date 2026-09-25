@@ -369,6 +369,12 @@ button.row {
 }
 .row .n { font-size: 1.05rem; color: var(--accent); font-weight: 600; min-width: 2.4rem; }
 .row small { display: block; color: var(--muted); font-size: .78rem; }
+.row.is-fav .row-main,
+.row.is-fav .n,
+.row.is-fav strong,
+.row.is-fav small {
+  font-family: var(--serif);
+}
 .top .search-wrap {
   margin: 0;
   width: 100%;
