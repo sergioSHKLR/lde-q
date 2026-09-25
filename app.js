@@ -459,7 +459,6 @@ function paintHome() {
         })()
       }
     </main>
-    <p class="legal-foot"><a href="${LEGAL_URL}" target="_blank" rel="noopener">${t("legalFoot")}</a></p>
     ${tabBar("home")}`;
 }
 
@@ -796,7 +795,7 @@ function settingsModal() {
       <p class="hint">${t("hyvorAccount")}</p>
       ${profile}
       <p class="hint">${t("legal")}</p>
-      <a class="chip" href="${LEGAL_URL}" target="_blank" rel="noopener">shklr.org</a>
+      <a class="legal-in-settings" href="${LEGAL_URL}" target="_blank" rel="noopener">${t("legalFoot")}</a>
       <p class="hint">${t("repo")}</p>
       <a class="chip" href="${REPO_URL}" target="_blank" rel="noopener">github.com/sergioSHKLR/lde-q</a>
       <p class="hint">${t("version")}</p>

@@ -245,7 +245,15 @@ html[data-theme="dark"] .note:focus {
   color: var(--muted);
   margin: 1.4rem 0 0.4rem;
 }
-.legal-foot a, .legal-inline a { color: var(--muted); text-decoration: underline; text-underline-offset: 2px; }
+.legal-in-settings {
+  display: block;
+  font-family: var(--sans);
+  font-size: .82rem;
+  color: var(--muted);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  margin: 0 0 .8rem;
+}
 .onboard-list {
   font-family: var(--sans);
   font-size: .9rem;
