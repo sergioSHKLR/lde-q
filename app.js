@@ -678,11 +678,6 @@ function paintQ(n) {
         <span class="chip-side">${t("commentsScope")}</span>
         <button class="chip share-end" data-act="share" title="${t("share")}"><i data-icon="share-2"></i> ${t("share")}</button>
       </div>
-      ${
-        state.noteOpen
-          ? `<textarea class="note" id="note" data-act="note"${t("notePh") ? ` placeholder="${esc(t("notePh"))}"` : ""}>${esc(note)}</textarea>`
-          : ""
-      }
       <aside class="comments" id="talk"></aside>
     </main>
     ${tabBar("q")}`;
