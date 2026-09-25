@@ -245,6 +245,12 @@ html[data-theme="dark"] .note:focus {
   color: var(--muted);
   margin: 1.4rem 0 0.4rem;
 }
+.version-line {
+  font-family: var(--sans);
+  font-size: .78rem;
+  color: var(--muted);
+  margin: .85rem 0 .35rem;
+}
 .legal-in-settings {
   display: block;
   font-family: var(--sans);

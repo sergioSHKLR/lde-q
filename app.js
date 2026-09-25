@@ -951,8 +951,7 @@ function settingsModal() {
       <a class="legal-in-settings" href="${LEGAL_URL}" target="_blank" rel="noopener">${t("legalFoot")}</a>
       <p class="hint">${t("repo")}</p>
       <a class="chip" href="${REPO_URL}" target="_blank" rel="noopener">github.com/sergioSHKLR/lde-q</a>
-      <p class="hint">${t("version")}</p>
-      <p class="version">${APP_VERSION}</p>
+      <p class="version-line">${t("version")} ${APP_VERSION}</p>
     </div>
   </div>`;
 }
