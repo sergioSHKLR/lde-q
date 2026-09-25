@@ -32,8 +32,13 @@ html, body {
   margin: 0;
   background: var(--paper);
   color: var(--ink);
-  font: 17px/1.5 var(--serif);
+  font-family: var(--serif);
+  font-size: 1rem;
+  line-height: 1.5;
 }
+html[data-font="sm"] { font-size: 15px; }
+html[data-font="md"] { font-size: 17px; }
+html[data-font="lg"] { font-size: 20px; }
 body {
   width: 100%;
   max-width: 100%;

@@ -94,6 +94,10 @@ const ui = {
     hideAnswers: "Ocultar respostas",
     answersDefault: "Respostas",
     answersHidden: "Respostas ocultas — estuda a pergunta primeiro.",
+    fontSize: "Tamanho",
+    fontSm: "Pequena",
+    fontMd: "Média",
+    fontLg: "Grande",
   },
   "en-US": {
     book: "The Spirits’ Book",
@@ -174,6 +178,10 @@ const ui = {
     showAnswers: "Show answers",
     hideAnswers: "Hide answers",
     answersHidden: "Answers hidden — sit with the question first.",
+    fontSize: "Size",
+    fontSm: "Small",
+    fontMd: "Medium",
+    fontLg: "Large",
   },
 };
 
@@ -199,11 +207,11 @@ const state = {
 function loadPref() {
   try {
     const raw = JSON.parse(localStorage.getItem(PREF_KEY) || "{}");
-    const next = { theme: "system", locale: "pt-BR", showAnswers: true, grifoColor: "gold", colorLabels: {}, ...raw };
+    const next = { theme: "system", locale: "pt-BR", showAnswers: true, fontSize: "md", grifoColor: "gold", colorLabels: {}, ...raw };
     if (!raw.answersUserSet) next.showAnswers = true;
     return next;
   } catch {
-    return { theme: "system", locale: "pt-BR", showAnswers: true, grifoColor: "gold", colorLabels: {} };
+    return { theme: "system", locale: "pt-BR", showAnswers: true, fontSize: "md", grifoColor: "gold", colorLabels: {} };
   }
 }
 function savePref() {
@@ -386,6 +394,8 @@ function applyTheme() {
   const dark = pref === "dark" || (pref === "system" && matchMedia("(prefers-color-scheme: dark)").matches);
   document.documentElement.dataset.theme = dark ? "dark" : "light";
   document.documentElement.lang = state.pref.locale === "en-US" ? "en-US" : "pt-BR";
+  const size = state.pref.fontSize;
+  document.documentElement.dataset.font = size === "sm" || size === "lg" ? size : "md";
 }
 
 function parseHash() {
@@ -943,6 +953,12 @@ function settingsModal() {
         <button class="chip ${theme === "light" ? "on" : ""}" data-act="theme-set" data-theme="light"><i data-icon="sun"></i> ${t("themeLight")}</button>
         <button class="chip ${theme === "dark" ? "on" : ""}" data-act="theme-set" data-theme="dark"><i data-icon="moon"></i> ${t("themeDark")}</button>
       </div>
+      <p class="hint">${t("fontSize")}</p>
+      <div class="filters">
+        <button class="chip ${state.pref.fontSize === "sm" ? "on" : ""}" data-act="font-set" data-size="sm">${t("fontSm")}</button>
+        <button class="chip ${state.pref.fontSize !== "sm" && state.pref.fontSize !== "lg" ? "on" : ""}" data-act="font-set" data-size="md">${t("fontMd")}</button>
+        <button class="chip ${state.pref.fontSize === "lg" ? "on" : ""}" data-act="font-set" data-size="lg">${t("fontLg")}</button>
+      </div>
       <p class="hint">${t("langLabel")}</p>
       <div class="filters">
         <button class="chip ${state.pref.locale === "en-US" ? "" : "on"}" data-act="lang-set" data-lang="pt-BR">PT-BR</button>
@@ -1170,6 +1186,14 @@ function onClick(e) {
       render();
       const el = document.getElementById("note");
       if (el) el.focus();
+      return;
+    }
+    if (a === "font-set") {
+      e.preventDefault();
+      const size = actEl.dataset.size;
+      state.pref.fontSize = size === "sm" || size === "lg" ? size : "md";
+      savePref();
+      render();
       return;
     }
     if (a === "answers-set") {
