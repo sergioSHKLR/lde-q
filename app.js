@@ -1059,7 +1059,9 @@ function paintList(filter) {
   const canFile = typeof window.showSaveFilePicker === "function" || typeof window.showOpenFilePicker === "function";
   const fileStatus = state.fileName
     ? `${t("fileHere")}: ${esc(state.fileName)}. ${state.fileNeedsGrant ? t("fileResume") : t("fileLinked")}`
-    : t("fileLocal");
+    : "";
+  const driveStatus = driveToken ? "" : t("driveOff");
+  const arquivoNote = [fileStatus, driveStatus].filter(Boolean).join("<br>");
   return `${topBar(`<strong>${esc(t("notebook"))}</strong>`)}
     <main class="page caderno ${state.filePanel ? "arquivo-open" : ""}">
       <div class="filters">
@@ -1084,7 +1086,7 @@ function paintList(filter) {
       </div>
       <section class="arquivo ${state.filePanel ? "open" : ""}">
         <button class="arquivo-head" data-act="toggle-file">
-          <span><strong>${t("fileSection")}</strong><small>${fileStatus}<br>${driveToken ? t("driveOn") : t("driveOff")}</small></span>
+          <span><strong>${t("fileSection")}</strong>${arquivoNote ? `<small>${arquivoNote}</small>` : ""}</span>
           <i data-icon="chevron-right"></i>
         </button>
         ${
