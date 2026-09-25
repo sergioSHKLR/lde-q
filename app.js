@@ -114,7 +114,7 @@ const ui = {
     onboardStart: "Start",
     onboardAnote: "Notes stay on this device.",
     onboardComente: "Comments are public (Hyvor).",
-    onboardShare: "Share sends the question URL.",
+    onboardShare: "Share sends only the question.",
     onboardEye: "The eye hides or shows the answers.",
     version: "Version",
     hyvorAccount: "Hyvor profile",
