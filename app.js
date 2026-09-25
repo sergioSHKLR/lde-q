@@ -940,8 +940,8 @@ function settingsModal() {
       </div>
       <p class="hint">${t("answersDefault")}</p>
       <div class="filters">
-        <button class="chip ${state.pref.showAnswers ? "on" : ""}" data-act="answers-set" data-on="1">${t("showAnswers")}</button>
-        <button class="chip ${state.pref.showAnswers ? "" : "on"}" data-act="answers-set" data-on="0">${t("hideAnswers")}</button>
+        <button class="chip ${state.pref.showAnswers ? "on" : ""}" data-act="answers-set" data-on="1"><i data-icon="eye"></i> ${t("showAnswers")}</button>
+        <button class="chip ${state.pref.showAnswers ? "" : "on"}" data-act="answers-set" data-on="0"><i data-icon="eye-off"></i> ${t("hideAnswers")}</button>
       </div>
       <p class="hint">${t("grifoColors")}</p>
       <div class="color-labels">
