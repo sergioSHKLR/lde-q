@@ -568,8 +568,8 @@ button.row {
   color: rgba(255,255,255,.92);
 }
 .tabbar [data-icon] svg {
-  width: 1.35rem;
-  height: 1.35rem;
+  width: calc(1.35 * 15px);
+  height: calc(1.35 * 15px);
 }
 .tools { display: flex; gap: .15rem; align-items: center; }
 .empty { color: var(--muted); padding: 2rem 0; text-align: center; }
