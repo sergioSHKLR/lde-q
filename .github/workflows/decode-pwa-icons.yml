@@ -11,12 +11,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Install Pillow
+        run: pip install pillow
       - name: Flatten cream icon field to white
         run: |
           python3 - <<'PY'
           from pathlib import Path
           from PIL import Image
-          paper = (244, 239, 230)
           for p in sorted(Path("pwa").glob("*.png")):
               im = Image.open(p).convert("RGBA")
               px = im.load()
