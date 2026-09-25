@@ -779,7 +779,7 @@ function paintList(filter) {
     ? `${t("fileHere")}: ${esc(state.fileName)}. ${state.fileNeedsGrant ? t("fileResume") : t("fileLinked")}`
     : t("fileLocal");
   return `${topBar(`<strong>${esc(t("notebook"))}</strong>`)}
-    <main class="page">
+    <main class="page caderno ${state.filePanel ? "arquivo-open" : ""}">
       <div class="filters">
         <button class="chip ${filter === "all" ? "on" : ""}" data-go="#/caderno">${t("allMarks")}</button>
         <button class="chip ${filter === "fav" ? "on" : ""}" data-go="#/caderno/fav">${t("fav")}</button>

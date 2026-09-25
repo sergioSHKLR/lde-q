@@ -427,10 +427,21 @@ button.row {
   margin: .2rem 2.4rem 0;
 }
 .arquivo {
-  margin-top: 1.4rem;
+  position: fixed;
+  z-index: 18;
+  left: var(--vv-left, 0px);
+  width: var(--app-w, 100%);
+  bottom: calc(var(--vv-bottom, 0px) + 4.35rem + env(safe-area-inset-bottom, 0px));
+  margin: 0;
+  padding: .55rem .95rem .5rem;
+  background: color-mix(in srgb, var(--paper) 94%, transparent);
+  backdrop-filter: blur(8px);
   border-top: 1px solid var(--line);
-  padding-top: .7rem;
+  max-height: 46dvh;
+  overflow: auto;
 }
+.caderno { padding-bottom: 4.8rem; }
+.caderno.arquivo-open { padding-bottom: 10rem; }
 .arquivo-head {
   width: 100%;
   display: flex;
