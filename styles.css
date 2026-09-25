@@ -339,6 +339,15 @@ button.row {
   border: 0;
   background: transparent;
   padding: .55rem 0;
+  outline: none;
+  box-shadow: none;
+}
+.search-wrap .search:focus {
+  outline: none;
+  box-shadow: none;
+}
+.search:focus, .note:focus, .jump:focus, .color-label input:focus {
+  outline: none;
 }
 .search-wrap [data-icon] { color: var(--muted); flex: 0 0 auto; }
 .search-wrap .clear {
