@@ -1371,6 +1371,7 @@ async function boot() {
     root.addEventListener("pointerdown", (e) => {
       if (e.target.closest("[data-act=grifo-color]")) e.preventDefault();
     });
+    root.addEventListener("click", onClick);
     root.addEventListener("change", onChange);
     root.addEventListener("input", onInput);
     root.addEventListener("keydown", onKey);
