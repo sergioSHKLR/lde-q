@@ -1,4 +1,4 @@
-const CACHE = "lde-q-v22";
+const CACHE = "lde-q-v23";
 const PRECACHE = [
   "./",
   "./index.html",
@@ -10,8 +10,7 @@ const PRECACHE = [
   "./se.js",
   "./manifest.webmanifest",
   "./brand/lde-favicon.svg",
-  "./pwa/lde-192.png",
-  "./pwa/lde-512.png",
+  "./pwa/lde-icon.svg",
 ];
 
 self.addEventListener("install", (event) => {
