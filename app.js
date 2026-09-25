@@ -830,7 +830,6 @@ function paintHome() {
     </header>
     <main class="page index">
       <div class="index-head">
-        <h2 class="book-title">${t("book")}</h2>
         <div class="index-actions">
           <button class="chip ${state.panel === "search" ? "on" : ""}" data-act="panel-search"><i data-icon="search"></i> ${t("searchBtn")}</button>
           <button class="chip ${state.panel === "history" ? "on" : ""}" data-act="panel-history"><i data-icon="history"></i> ${t("history")}</button>

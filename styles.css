@@ -53,7 +53,7 @@ button, input, textarea {
 button, input, textarea, label, .tabbar, .top, .pill, .chip, .lang, .kicker, .qnum, .filters, .row small, .sub {
   font-family: var(--sans);
 }
-.prompt, .block p, .note, .book-title, .index-parte h2, .row strong, .page > h1 {
+.prompt, .block p, .note, .index-parte h2, .row strong, .page > h1 {
   font-family: var(--serif);
 }
 img, svg, video, iframe {
@@ -429,13 +429,23 @@ button.row {
   text-align: center;
   width: 100%;
   box-sizing: border-box;
-  padding: 1.5rem 1.25rem 1.25rem;
+  padding: calc(1.5 * 15px) calc(1.25 * 15px) calc(1.25 * 15px);
   border-bottom: 1px solid var(--line);
   background: var(--paper);
   font-family: var(--sans);
 }
-.brand-mark { display: flex; color: var(--accent); }
-.brand-mark svg { width: calc(3.5 * 15px); height: calc(3.5 * 15px); }
+.brand-mark {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--accent);
+  line-height: 0;
+}
+.brand-mark svg {
+  width: calc(3.5 * 15px);
+  height: calc(3.5 * 15px);
+  display: block;
+}
 .brand h1 {
   margin: 0;
   font-family: var(--sans);
@@ -454,18 +464,11 @@ button.row {
   line-height: 1.35;
   color: var(--muted);
 }
+.page.index { padding-top: calc(1.25 * 15px); }
 .index-head {
   text-align: center;
-  margin: .4rem 0 1.1rem;
+  margin: 0 0 1.1rem;
   position: relative;
-}
-.book-title {
-  font-family: var(--serif);
-  font-size: 1.35rem;
-  font-weight: 600;
-  letter-spacing: 0;
-  line-height: 1.2;
-  margin: .2rem 0 0;
 }
 .arquivo {
   position: fixed;
