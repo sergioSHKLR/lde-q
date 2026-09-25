@@ -89,7 +89,7 @@ const ui = {
     import: "Import notebook",
     highlightHint: "Select text, then tap Highlight",
     highlight: "Highlight",
-    bookCrumb: "Book",
+    bookCrumb: "LDE",
     filter: "Filter…",
     search: "Search questions…",
     searchEmpty: "Nothing found.",
@@ -151,7 +151,10 @@ function rememberQ(n) {
 }
 function t(key) {
   const loc = state.pref.locale === "en-US" ? "en-US" : "pt-BR";
-  return (ui[loc] && ui[loc][key]) || ui["pt-BR"][key] || key;
+  const bag = ui[loc] || ui["pt-BR"];
+  if (Object.prototype.hasOwnProperty.call(bag, key)) return bag[key];
+  if (Object.prototype.hasOwnProperty.call(ui["pt-BR"], key)) return ui["pt-BR"][key];
+  return key;
 }
 function applyTheme() {
   const pref = state.pref.theme || "system";
@@ -425,7 +428,7 @@ function paintQ(n) {
           : ``
       }
       <label class="hint" for="note">${t("note")}</label>
-      <textarea class="note" id="note" data-act="note" placeholder="${t("notePh")}">${esc(note)}</textarea>
+      <textarea class="note" id="note" data-act="note"${t("notePh") ? ` placeholder="${esc(t("notePh"))}"` : ""}>${esc(note)}</textarea>
       <aside class="comments" id="talk">
         <div class="hint">${t("comments")}</div>
       </aside>
