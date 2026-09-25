@@ -265,6 +265,7 @@ button.row {
   padding: .55rem 0;
 }
 .search-wrap [data-icon] { color: var(--muted); }
+[data-icon="search"] svg { transform: scaleX(-1); }
 .tagline {
   font-family: var(--sans);
   font-size: .82rem;
