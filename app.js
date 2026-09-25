@@ -761,8 +761,6 @@ function settingsModal() {
   </div>`;
 }
 
-}
-
 function dismissOnboard(goFirst) {
   try {
     localStorage.setItem(ONBOARD_KEY, "1");
