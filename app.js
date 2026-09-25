@@ -775,7 +775,7 @@ function onboardCard() {
   return `<div class="modal-back" data-act="onboard-skip">
     <div class="modal" role="dialog" aria-label="${t("study")}" data-act="modal-box">
       <div class="kicker"><i data-icon="sparkles" data-icon-size="22" class="brand"></i></div>
-      <p class="tagline">${t("study")}</p>
+      <p class="tagline onboard-slogan">${t("study")}</p>
       <ul class="onboard-list">
         <li>${t("onboardAnote")}</li>
         <li>${t("onboardComente")}</li>

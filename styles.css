@@ -247,6 +247,14 @@ h1 {
 }
 .onboard-list li { margin: .35rem 0; }
 .modal .tagline { text-align: center; }
+.onboard-slogan {
+  font-family: var(--sans);
+  font-size: 1.25rem;
+  font-weight: 700;
+  letter-spacing: .02em;
+  color: var(--ink);
+  margin: .35rem 0 .7rem;
+}
 .modal .kicker { margin-bottom: .2rem; }
 .modal .chip.on { width: 100%; justify-content: center; }
 .block {
