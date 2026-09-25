@@ -1,4 +1,4 @@
-import { hydrateIcons } from "./icons.js";
+import { hydrateIcons } from "./icons.js?v=scale1";
 
 const HYVOR_WEBSITE_ID = "16128";
 const APP_VERSION = "0.3.0";
@@ -1252,7 +1252,7 @@ function settingsModal() {
       <p class="hint">${t("repo")}</p>
       <a class="chip" href="${REPO_URL}" target="_blank" rel="noopener">github.com/sergioSHKLR/lde-q</a>
       <p class="hint">${t("legal")}</p>
-      <a class="legal-in-settings" href="${LEGAL_URL}" target="_blank" rel="noopener">${t("legalFoot")}</a>
+      <a class="chip" href="${LEGAL_URL}" target="_blank" rel="noopener"><i data-icon="scale"></i> ${t("legalFoot")}</a>
     </div>
   </div>`;
 }
