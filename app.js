@@ -44,6 +44,7 @@ const ui = {
     bookCrumb: "LDE",
     filter: "Filtrar…",
     search: "Buscar questões…",
+    searchBtn: "Buscar",
     searchEmpty: "Nada encontrado.",
     searchHits: "questões",
     prev: "Anterior",
@@ -91,7 +92,7 @@ const ui = {
     highlight: "Highlight",
     bookCrumb: "LDE",
     filter: "Filter…",
-    search: "Search questions…",
+    searchBtn: "Search",
     searchEmpty: "Nothing found.",
     searchHits: "questions",
     prev: "Previous",
@@ -107,8 +108,9 @@ const state = {
   marks: loadMarks(),
   pref: loadPref(),
   qSearch: "",
+  histFilter: "",
   history: loadHistory(),
-  showHistory: false,
+  panel: null,
 };
 
 function loadPref() {
@@ -311,33 +313,37 @@ function paintHome() {
         <h1 class="book-title">${t("book")}</h1>
         <p class="tagline">${t("study")}</p>
         <div class="index-actions">
-          <button class="chip ${state.showHistory ? "on" : ""}" data-act="toggle-history"><i data-icon="history"></i> ${t("history")}</button>
+          <button class="chip ${state.panel === "history" ? "on" : ""}" data-act="panel-history"><i data-icon="history"></i> ${t("history")}</button>
+          <button class="chip ${state.panel === "search" ? "on" : ""}" data-act="panel-search"><i data-icon="search"></i> ${t("searchBtn")}</button>
         </div>
         ${
-          state.showHistory
-            ? `<div class="history">${
-                hist.length
-                  ? hist
-                      .map(
-                        (q) => `<button class="row" data-go="#/q/${q.n}">
+          state.panel === "history"
+            ? `<input class="jump show" data-act="hist-filter" value="${esc(state.histFilter)}" placeholder="${t("filter")}" />
+        <div class="history">${
+          hist.filter((q) => !state.histFilter.trim() || fold(contentOf(q).prompt + " " + q.n + " " + q.label).includes(fold(state.histFilter))).length
+            ? hist
+                .filter((q) => !state.histFilter.trim() || fold(contentOf(q).prompt + " " + q.n + " " + q.label).includes(fold(state.histFilter)))
+                .map(
+                  (q) => `<button class="row" data-go="#/q/${q.n}">
             <span class="n">${esc(pretty(q.n))}</span>
             <span><strong>${esc(contentOf(q).prompt || q.label)}</strong></span>
           </button>`
-                      )
-                      .join("")
-                  : `<p class="empty">${t("emptyHistory")}</p>`
-              }</div>`
-            : ""
-        }
-        <input class="jump show" id="jump" inputmode="text" placeholder="${t("jump")}" />
-        <label class="search-wrap">
+                )
+                .join("")
+            : `<p class="empty">${t("emptyHistory")}</p>`
+        }</div>`
+            : state.panel === "search"
+              ? `<label class="search-wrap">
           <input class="search" data-act="search" value="${esc(state.qSearch)}" placeholder="${t("search")}" />
           <i data-icon="search"></i>
-        </label>
+        </label>`
+              : ""
+        }
       </div>
       ${
         (() => {
-          const qstr = state.qSearch.trim();
+          const qstr = state.panel === "search" ? state.qSearch.trim() : "";
+          if (state.panel === "history") return "";
           if (!qstr) {
             return groups
               .map(
@@ -669,13 +675,23 @@ function onClick(e) {
     render();
   }
   if (a === "open-search") {
+    state.panel = "search";
     state.focusSearch = true;
     go("#/");
     return;
   }
-  if (a === "toggle-history") {
-    state.showHistory = !state.showHistory;
+  if (a === "panel-history") {
+    state.panel = state.panel === "history" ? null : "history";
     render();
+    const el = document.querySelector("[data-act=hist-filter]");
+    if (el) el.focus();
+    return;
+  }
+  if (a === "panel-search") {
+    state.panel = state.panel === "search" ? null : "search";
+    render();
+    const el = document.querySelector("[data-act=search]");
+    if (el) el.focus();
     return;
   }
   if (a === "toggle-jump") {
@@ -749,6 +765,18 @@ function onInput(e) {
       } catch {}
     }
   }
+  if (e.target.dataset.act === "hist-filter") {
+    state.histFilter = e.target.value;
+    const pos = e.target.selectionStart;
+    render();
+    const el = document.querySelector("[data-act=hist-filter]");
+    if (el) {
+      el.focus();
+      try {
+        el.setSelectionRange(pos, pos);
+      } catch {}
+    }
+  }
   if (e.target.dataset.act === "filter") {
     const q = fold(e.target.value).trim();
     document.querySelectorAll("[data-list] .row").forEach((row) => {
@@ -794,4 +822,4 @@ async function boot() {
 }
 
 boot();
-oot();
+
