@@ -397,14 +397,15 @@ button.row {
   position: absolute;
   top: 0;
   right: 0;
+  z-index: 2;
 }
 .book-title {
   font-family: var(--serif);
-  font-size: 1.85rem;
+  font-size: 1.35rem;
   font-weight: 600;
   letter-spacing: 0;
-  line-height: 1.15;
-  margin: .2rem 0 0;
+  line-height: 1.2;
+  margin: .2rem 2.4rem 0;
 }
 .index-actions {
   display: flex;
