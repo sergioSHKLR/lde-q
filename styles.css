@@ -190,6 +190,14 @@ h1 {
   padding-top: .75rem;
   border-top: 1px solid var(--line);
 }
+.comments-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: .5rem;
+  margin-bottom: .35rem;
+}
+.comments-head .hint { margin: 0; }
 .block {
   background: var(--card);
   border: 1px solid var(--line);

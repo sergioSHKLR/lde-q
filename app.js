@@ -57,7 +57,7 @@ const ui = {
     comments: "Comente (público)",
     shareFail: "Copia o endereço da questão para partilhar.",
     copied: "Ligação copiada",
-    share: "Partilhar",
+    share: "Compartilhar",
     export: "Exportar caderno",
     import: "Importar caderno",
     highlightHint: "Selecione texto, escolha cor e clique Grifar",
@@ -481,9 +481,6 @@ function paintQ(n) {
             <i data-icon="${shown ? "eye" : "eye-off"}"></i>
           </button>
           <button class="iconbtn star ${fav ? "on" : ""}" data-act="fav" title="${t("fav")}">${iconStar(fav)}</button>
-          <button class="iconbtn" data-act="share" title="${t("share")}">
-            <i data-icon="share-2"></i>
-          </button>
         </div>
         <button class="iconbtn" data-go="${q.next ? `#/q/${q.next}` : ""}" ${q.next ? "" : "disabled"} title="${t("next")}">
           <i data-icon="chevron-right"></i>
@@ -504,7 +501,10 @@ function paintQ(n) {
       <label class="hint" for="note">${t("note")}</label>
       <textarea class="note" id="note" data-act="note"${t("notePh") ? ` placeholder="${esc(t("notePh"))}"` : ""}>${esc(note)}</textarea>
       <aside class="comments" id="talk">
-        <div class="hint">${t("comments")}</div>
+        <div class="comments-head">
+          <div class="hint">${t("comments")}</div>
+          <button class="chip" data-act="share" title="${t("share")}"><i data-icon="share-2"></i> ${t("share")}</button>
+        </div>
       </aside>
     </main>
     ${tabBar("q")}`;
