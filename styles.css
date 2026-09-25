@@ -184,12 +184,12 @@ h1 {
   color: var(--muted);
 }
 .prompt { font-size: 1.28rem; margin: .35rem 0 .8rem; font-weight: 500; }
-.hint {
+.set-title {
   font-family: var(--sans);
-  font-weight: 600;
-  color: var(--muted);
-  font-size: .78rem;
-  margin: .85rem 0 .35rem;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--ink);
+  margin: 1.05rem 0 .4rem;
   display: block;
 }
 .note-toggle {
@@ -257,11 +257,20 @@ html[data-theme="dark"] .note:focus {
   color: var(--muted);
   margin: 1.4rem 0 0.4rem;
 }
+.hint {
+  font-family: var(--sans);
+  font-weight: 500;
+  color: var(--muted);
+  font-size: .78rem;
+  margin: .85rem 0 .35rem;
+  display: block;
+}
 .version-line {
   font-family: var(--sans);
-  font-size: .78rem;
-  color: var(--muted);
-  margin: .85rem 0 .35rem;
+  font-size: .95rem;
+  font-weight: 600;
+  color: var(--ink);
+  margin: 0 0 .35rem;
 }
 .legal-in-settings {
   display: block;

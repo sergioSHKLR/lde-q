@@ -1,4 +1,4 @@
-import { hydrateIcons } from "./icons.js?v=scale1";
+import { hydrateIcons } from "./icons.js?v=box1";
 
 const HYVOR_WEBSITE_ID = "16128";
 const APP_VERSION = "0.3.0";
@@ -37,7 +37,7 @@ const ui = {
     langLabel: "Idioma",
     repo: "Repositório",
     legal: "Aviso",
-    legalFoot: "Texto em domínio público. Aviso legal",
+    legalFoot: "Aviso legal",
     commentPublic: "Ao comentar, o texto fica público.",
     onboardStart: "Começar",
     onboardAnote: "Anote fica neste aparelho.",
@@ -125,7 +125,7 @@ const ui = {
     langLabel: "Language",
     repo: "Repository",
     legal: "Notice",
-    legalFoot: "Public-domain text. Legal notice",
+    legalFoot: "Legal notice",
     commentPublic: "Comments are public.",
     onboardStart: "Start",
     onboardAnote: "Notes stay on this device.",
@@ -1220,38 +1220,39 @@ function settingsModal() {
         <strong>${t("settings")}</strong>
         <button class="iconbtn" data-act="close-settings" title="${t("close")}">×</button>
       </div>
-      <p class="hint">${t("theme")}</p>
+      <p class="set-title">${t("theme")}</p>
       <div class="filters">
         <button class="chip ${theme === "system" ? "on" : ""}" data-act="theme-set" data-theme="system"><i data-icon="monitor"></i> ${t("themeSystem")}</button>
         <button class="chip ${theme === "light" ? "on" : ""}" data-act="theme-set" data-theme="light"><i data-icon="sun"></i> ${t("themeLight")}</button>
         <button class="chip ${theme === "dark" ? "on" : ""}" data-act="theme-set" data-theme="dark"><i data-icon="moon"></i> ${t("themeDark")}</button>
       </div>
-      <p class="hint">${t("fontSize")}</p>
+      <p class="set-title">${t("fontSize")}</p>
       <div class="filters">
         <button class="chip ${state.pref.fontSize === "sm" ? "on" : ""}" data-act="font-set" data-size="sm">${t("fontSm")}</button>
         <button class="chip ${state.pref.fontSize !== "sm" && state.pref.fontSize !== "lg" ? "on" : ""}" data-act="font-set" data-size="md">${t("fontMd")}</button>
         <button class="chip ${state.pref.fontSize === "lg" ? "on" : ""}" data-act="font-set" data-size="lg">${t("fontLg")}</button>
       </div>
-      <p class="hint">${t("langLabel")}</p>
+      <p class="set-title">${t("langLabel")}</p>
       <div class="filters">
         <button class="chip ${state.pref.locale === "en-US" ? "" : "on"}" data-act="lang-set" data-lang="pt-BR">PT-BR</button>
         <button class="chip ${state.pref.locale === "en-US" ? "on" : ""}" data-act="lang-set" data-lang="en-US" ${enOn ? "" : "disabled"} title="${t("langOff")}">EN-US</button>
       </div>
-      <p class="hint">${t("answersDefault")}</p>
+      <p class="set-title">${t("answersDefault")}</p>
       <div class="filters">
         <button class="chip ${state.pref.showAnswers ? "on" : ""}" data-act="answers-set" data-on="1"><i data-icon="eye"></i> ${t("showAnswers")}</button>
         <button class="chip ${state.pref.showAnswers ? "" : "on"}" data-act="answers-set" data-on="0"><i data-icon="eye-off"></i> ${t("hideAnswers")}</button>
       </div>
-      <p class="hint">${t("grifoColors")}</p>
+      <p class="set-title">${t("grifoColors")}</p>
       <div class="color-labels">
         ${GRIFO.map((c) => `<label class="color-label"><span class="swatch" style="--sw:${c.hex}"></span><input id="grifo-${c.id}" name="grifo-${c.id}" data-act="color-label" data-color="${c.id}" value="${esc(colorLabel(c.id))}" /></label>`).join("")}
       </div>
-      <p class="hint">${t("hyvorAccount")}</p>
+      <p class="set-title">${t("hyvorAccount")}</p>
       ${profile}
-      <p class="version-line">${t("version")} ${APP_VERSION}</p>
-      <p class="hint">${t("repo")}</p>
-      <a class="chip" href="${REPO_URL}" target="_blank" rel="noopener">github.com/sergioSHKLR/lde-q</a>
-      <p class="hint">${t("legal")}</p>
+      <p class="set-title">${t("version")}</p>
+      <p class="version-line">${APP_VERSION}</p>
+      <p class="set-title">${t("repo")}</p>
+      <a class="chip" href="${REPO_URL}" target="_blank" rel="noopener"><i data-icon="box"></i> github.com/sergioSHKLR/lde-q</a>
+      <p class="set-title">${t("legal")}</p>
       <a class="chip" href="${LEGAL_URL}" target="_blank" rel="noopener"><i data-icon="scale"></i> ${t("legalFoot")}</a>
     </div>
   </div>`;
