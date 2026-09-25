@@ -13,6 +13,7 @@ const GRIFO = [
 const GRIFO_IDS = GRIFO.map((c) => c.id);
 const MARKS_KEY = "lde-q-marks-v1";
 const HISTORY_KEY = "lde-q-history-v1";
+const ONBOARD_KEY = "lde-q-seen-onboard";
 
 const ui = {
   "pt-BR": {
@@ -38,6 +39,11 @@ const ui = {
     legal: "Aviso",
     legalFoot: "Texto em domínio público. Aviso legal",
     commentPublic: "Ao comentar, o texto fica público.",
+    onboardStart: "Começar",
+    onboardAnote: "Anote fica neste aparelho.",
+    onboardComente: "Comente é público (Hyvor).",
+    onboardShare: "Compartilhar envia o endereço da questão.",
+    onboardEye: "Respostas começam ocultas. O olho mostra.",
     version: "Versão",
     hyvorAccount: "Perfil Hyvor",
     hyvorOff: "Abre uma questão e entra no Hyvor para ver o perfil aqui.",
@@ -103,6 +109,11 @@ const ui = {
     legal: "Notice",
     legalFoot: "Public-domain text. Legal notice",
     commentPublic: "Comments are public.",
+    onboardStart: "Start",
+    onboardAnote: "Notes stay on this device.",
+    onboardComente: "Comments are public (Hyvor).",
+    onboardShare: "Share sends the question URL.",
+    onboardEye: "Answers start hidden. The eye reveals them.",
     version: "Version",
     hyvorAccount: "Hyvor profile",
     hyvorOff: "Open a question and sign in to Hyvor to see the profile here.",
@@ -159,6 +170,7 @@ const state = {
   showSettings: false,
   hyvorUser: null,
   noteOpen: false,
+  showOnboard: !localStorage.getItem(ONBOARD_KEY),
 };
 
 function loadPref() {
@@ -749,6 +761,35 @@ function settingsModal() {
   </div>`;
 }
 
+}
+
+function dismissOnboard(goFirst) {
+  try {
+    localStorage.setItem(ONBOARD_KEY, "1");
+  } catch {}
+  state.showOnboard = false;
+  if (goFirst) go("#/q/1");
+  else render();
+}
+
+function onboardCard() {
+  if (!state.showOnboard) return "";
+  return `<div class="modal-back" data-act="onboard-skip">
+    <div class="modal" role="dialog" aria-label="${t("study")}" data-act="modal-box">
+      <div class="kicker"><i data-icon="sparkles" data-icon-size="22" class="brand"></i></div>
+      <p class="tagline">${t("study")}</p>
+      <ul class="onboard-list">
+        <li>${t("onboardAnote")}</li>
+        <li>${t("onboardComente")}</li>
+        <li>${t("onboardShare")}</li>
+        <li>${t("onboardEye")}</li>
+      </ul>
+      <button class="chip on" data-act="onboard-start">${t("onboardStart")}</button>
+      <p class="legal-foot"><a href="${LEGAL_URL}" target="_blank" rel="noopener">${t("legalFoot")}</a></p>
+    </div>
+  </div>`;
+}
+
 function destroyTalk() {
   document.querySelectorAll("hyvor-talk-comments").forEach((el) => el.remove());
 }
@@ -780,7 +821,7 @@ function render() {
   else if (r.name === "cap") html = paintCap(r.cap);
   else if (r.name === "sec") html = paintSec(r.sec);
   else html = paintHome();
-  root.innerHTML = html + settingsModal();
+  root.innerHTML = html + settingsModal() + onboardCard();
   hydrateIcons(root);
   if (r.name === "q") mountTalk(r.n);
   if (state.showSettings) readHyvorUser();
@@ -821,6 +862,16 @@ function onClick(e) {
     }
     if (a === "modal-box") {
       e.stopPropagation();
+      return;
+    }
+    if (a === "onboard-start") {
+      e.preventDefault();
+      dismissOnboard(true);
+      return;
+    }
+    if (a === "onboard-skip") {
+      e.preventDefault();
+      dismissOnboard(false);
       return;
     }
     if (a === "open-settings") {

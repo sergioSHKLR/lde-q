@@ -211,12 +211,18 @@ h1 {
   margin: 1.4rem 0 0.4rem;
 }
 .legal-foot a, .legal-inline a { color: var(--muted); text-decoration: underline; text-underline-offset: 2px; }
-.legal-inline {
+.onboard-list {
   font-family: var(--sans);
-  font-size: .72rem;
-  color: var(--muted);
-  margin: 0 0 .55rem;
+  font-size: .9rem;
+  line-height: 1.45;
+  padding: 0 0 0 1.1rem;
+  margin: .4rem 0 1rem;
+  color: var(--ink);
 }
+.onboard-list li { margin: .35rem 0; }
+.modal .tagline { text-align: center; }
+.modal .kicker { margin-bottom: .2rem; }
+.modal .chip.on { width: 100%; justify-content: center; }
 .block {
   background: var(--card);
   border: 1px solid var(--line);
