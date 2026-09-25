@@ -28,6 +28,6 @@
   flex-wrap: wrap;
 }
 .version-line .chip {
-  font-size: .72rem;
+  font-size: 15px;
   padding: .2rem .6rem;
 }

@@ -267,7 +267,7 @@ html[data-theme="dark"] .note:focus {
 }
 .version-line {
   font-family: var(--sans);
-  font-size: .95rem;
+  font-size: 15px;
   font-weight: 600;
   color: var(--ink);
   margin: 0 0 .35rem;
@@ -687,6 +687,7 @@ button.row {
   font-family: var(--sans);
 }
 .modal {
+  font-size: 15px;
   width: min(420px, 92vw);
   max-width: 100%;
   min-height: 0;
@@ -717,7 +718,7 @@ button.row {
 .modal-head .iconbtn {
   width: 2.6rem;
   height: 2.6rem;
-  font-size: 1.85rem;
+  font-size: 28px;
   line-height: 1;
 }
 .modal fieldset {
@@ -731,7 +732,7 @@ button.row {
 }
 .modal legend {
   font-family: var(--sans);
-  font-size: .8rem;
+  font-size: 15px;
   font-weight: 600;
   color: var(--muted);
   padding: 0 .35rem;
@@ -748,7 +749,7 @@ button.row {
   opacity: .4;
   cursor: not-allowed;
 }
-.modal fieldset .hint { margin: 0; }
+.modal fieldset .hint { margin: 0; font-size: 15px; }
 .modal fieldset a {
   color: var(--accent);
   font-weight: 600;
@@ -825,7 +826,7 @@ button.swatch.on { outline: 2px solid var(--ink); outline-offset: 2px; }
 .color-label input {
   flex: 1;
   font-family: var(--sans);
-  font-size: .85rem;
+  font-size: 15px;
   padding: .35rem .5rem;
   border: 1px solid var(--line);
   border-radius: .45rem;
