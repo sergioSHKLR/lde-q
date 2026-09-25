@@ -818,9 +818,11 @@ function dismissOnboard(goFirst) {
 function onboardCard() {
   if (!state.showOnboard) return "";
   return `<div class="modal-back" data-act="onboard-skip">
-    <div class="modal" role="dialog" aria-label="${t("study")}" data-act="modal-box">
-      <div class="kicker"><i data-icon="sparkles" data-icon-size="22" class="brand"></i></div>
-      <p class="tagline onboard-slogan">${t("study")}</p>
+    <div class="modal" role="dialog" aria-label="LDE-Q" data-act="modal-box">
+      <div class="onboard-brand">
+        <i data-icon="sparkles" data-icon-size="28" class="brand"></i>
+        <strong>LDE-Q</strong>
+      </div>
       <ul class="onboard-list">
         <li>${t("onboardAnote")}</li>
         <li>${t("onboardComente")}</li>

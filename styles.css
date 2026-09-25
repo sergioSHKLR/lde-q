@@ -246,15 +246,20 @@ h1 {
   color: var(--ink);
 }
 .onboard-list li { margin: .35rem 0; }
-.modal .tagline { text-align: center; }
-.onboard-slogan {
+.onboard-brand {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: .55rem;
+  margin: .15rem 0 .75rem;
   font-family: var(--sans);
-  font-size: 1.25rem;
-  font-weight: 700;
-  letter-spacing: .02em;
-  color: var(--ink);
-  margin: .35rem 0 .7rem;
 }
+.onboard-brand strong {
+  font-size: 1.35rem;
+  font-weight: 700;
+  letter-spacing: .06em;
+}
+.onboard-brand .brand { color: #c17f3e; }
 .modal .kicker { margin-bottom: .2rem; }
 .modal [data-act="onboard-start"] {
   width: 100%;
