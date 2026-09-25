@@ -536,7 +536,6 @@ function paintQ(n) {
           <span class="chip-side">${t("commentsScope")}</span>
           <button class="chip" data-act="share" title="${t("share")}"><i data-icon="share-2"></i> ${t("share")}</button>
         </div>
-        <p class="legal-inline">${t("commentPublic")} <a href="${LEGAL_URL}" target="_blank" rel="noopener">${t("legal")}</a>.</p>
       </aside>
     </main>
     ${tabBar("q")}`;
