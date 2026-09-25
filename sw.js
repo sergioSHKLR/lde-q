@@ -1,4 +1,4 @@
-const CACHE = "lde-q-v41";
+const CACHE = "lde-q-v42";
 const PRECACHE = [
   "./",
   "./index.html",
