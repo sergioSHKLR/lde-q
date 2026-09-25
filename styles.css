@@ -185,6 +185,8 @@ h1 {
 }
 .prompt { font-size: 1.28rem; margin: .35rem 0 .8rem; font-weight: 500; }
 .hint {
+  font-family: var(--sans);
+  font-weight: 600;
   color: var(--muted);
   font-size: .78rem;
   margin: .85rem 0 .35rem;
@@ -623,6 +625,7 @@ button.row {
   touch-action: none;
 }
 .modal {
+  font-family: var(--sans);
   width: min(28rem, 100%);
   max-width: 100%;
   min-height: 0;
@@ -642,8 +645,11 @@ button.row {
   align-items: center;
   justify-content: space-between;
   font-family: var(--sans);
+  font-weight: 700;
   margin-bottom: .4rem;
 }
+.hyvor-row strong { font-weight: 700; }
+.hyvor-row small { font-weight: 500; }
 .modal-head .iconbtn {
   width: 2.6rem;
   height: 2.6rem;
