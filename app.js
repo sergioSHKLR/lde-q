@@ -929,9 +929,9 @@ function settingsModal() {
       </div>
       <p class="hint">${t("theme")}</p>
       <div class="filters">
-        <button class="chip ${theme === "system" ? "on" : ""}" data-act="theme-set" data-theme="system">${t("themeSystem")}</button>
-        <button class="chip ${theme === "light" ? "on" : ""}" data-act="theme-set" data-theme="light">${t("themeLight")}</button>
-        <button class="chip ${theme === "dark" ? "on" : ""}" data-act="theme-set" data-theme="dark">${t("themeDark")}</button>
+        <button class="chip ${theme === "system" ? "on" : ""}" data-act="theme-set" data-theme="system"><i data-icon="monitor"></i> ${t("themeSystem")}</button>
+        <button class="chip ${theme === "light" ? "on" : ""}" data-act="theme-set" data-theme="light"><i data-icon="sun"></i> ${t("themeLight")}</button>
+        <button class="chip ${theme === "dark" ? "on" : ""}" data-act="theme-set" data-theme="dark"><i data-icon="moon"></i> ${t("themeDark")}</button>
       </div>
       <p class="hint">${t("langLabel")}</p>
       <div class="filters">
