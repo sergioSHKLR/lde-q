@@ -31,7 +31,7 @@ html, body {
 button, input, textarea {
   color: inherit;
 }
-button, input, textarea, .tabbar, .top, .pill, .chip, .lang, .kicker, .qnum, .filters, .row small, .sub {
+button, input, textarea, label, .tabbar, .top, .pill, .chip, .lang, .kicker, .qnum, .filters, .row small, .sub {
   font-family: var(--sans);
 }
 .prompt, .block p, .note {
@@ -303,6 +303,10 @@ button.row {
   display: inline-flex;
   align-items: center;
   gap: .35rem;
+  font-family: var(--sans);
+  font-size: .82rem;
+  font-weight: 600;
+  line-height: 1.2;
 }
 .chip.on { background: var(--ink); color: var(--paper); border-color: var(--ink); }
 .tabbar {
