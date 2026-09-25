@@ -123,6 +123,7 @@ const ui = {
     searchHits: "questions",
     prev: "Previous",
     next: "Next",
+    answersDefault: "Answers",
     showAnswers: "Show answers",
     hideAnswers: "Hide answers",
     answersHidden: "Answers hidden — sit with the question first.",
@@ -669,6 +670,11 @@ function settingsModal() {
       <button class="lang" data-act="lang" data-off="${enOn ? "0" : "1"}" ${enOn ? "" : "disabled"} title="${t("langOff")}">
         <i data-icon="lang-pt" data-icon-size="16"></i><span>/</span><i data-icon="lang-en" data-icon-size="16"></i>
       </button>
+      <p class="hint">${t("answersDefault")}</p>
+      <div class="filters">
+        <button class="chip ${state.pref.showAnswers ? "" : "on"}" data-act="answers-set" data-on="0">${t("hideAnswers")}</button>
+        <button class="chip ${state.pref.showAnswers ? "on" : ""}" data-act="answers-set" data-on="1">${t("showAnswers")}</button>
+      </div>
       <p class="hint">${t("hyvorAccount")}</p>
       ${profile}
       <p class="hint">${t("repo")}</p>
@@ -677,8 +683,6 @@ function settingsModal() {
       <p class="version">${APP_VERSION}</p>
     </div>
   </div>`;
-}
-  document.querySelectorAll("hyvor-talk-comments").forEach((el) => el.remove());
 }
 
 function destroyTalk() {
@@ -767,7 +771,13 @@ function onClick(e) {
       render();
       return;
     }
-    if (a === "theme-set") {
+    if (a === "answers-set") {
+      e.preventDefault();
+      state.pref.showAnswers = actEl.dataset.on === "1";
+      savePref();
+      render();
+      return;
+    }
       e.preventDefault();
       state.pref.theme = actEl.dataset.theme || "system";
       savePref();
