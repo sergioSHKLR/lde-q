@@ -1356,7 +1356,22 @@ function onKey(e) {
   }
 }
 
+function fitViewport() {
+  const vv = window.visualViewport;
+  const h = vv ? vv.height : window.innerHeight;
+  const top = vv ? vv.offsetTop : 0;
+  const gap = Math.max(0, window.innerHeight - top - h);
+  const root = document.documentElement;
+  root.style.setProperty("--app-h", Math.round(h) + "px");
+  root.style.setProperty("--vv-top", Math.round(top) + "px");
+  root.style.setProperty("--vv-bottom", Math.round(gap) + "px");
+}
+
 async function boot() {
+  fitViewport();
+  window.visualViewport && window.visualViewport.addEventListener("resize", fitViewport);
+  window.visualViewport && window.visualViewport.addEventListener("scroll", fitViewport);
+  window.addEventListener("resize", fitViewport);
   applyTheme();
   const root = document.getElementById("app");
   root.className = "app";

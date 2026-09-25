@@ -25,7 +25,8 @@ html[data-theme="dark"] {
 html {
   width: 100%;
   max-width: 100%;
-  overflow-x: clip;
+  height: 100%;
+  overflow: hidden;
 }
 html, body {
   margin: 0;
@@ -36,8 +37,8 @@ html, body {
 body {
   width: 100%;
   max-width: 100%;
-  min-height: 100dvh;
-  overflow-x: clip;
+  height: 100%;
+  overflow: hidden;
   padding-left: env(safe-area-inset-left, 0px);
   padding-right: env(safe-area-inset-right, 0px);
 }
@@ -54,9 +55,15 @@ img, svg, video, iframe {
   max-width: 100%;
 }
 .app {
-  min-height: 100dvh;
+  position: fixed;
+  top: var(--vv-top, 0px);
+  left: 0;
+  right: 0;
+  height: var(--app-h, 100svh);
   max-width: 100%;
   overflow-x: clip;
+  overflow-y: auto;
+  overscroll-behavior: contain;
   padding-bottom: var(--safe-b);
 }
 .top {
@@ -469,7 +476,7 @@ button.row {
   color: var(--muted);
 }
 .tabbar {
-  position: fixed; left: 0; right: 0; bottom: 0;
+  position: fixed; left: 0; right: 0; bottom: var(--vv-bottom, 0px);
   width: 100%;
   max-width: 100%;
   display: grid; grid-template-columns: repeat(3, 1fr);
