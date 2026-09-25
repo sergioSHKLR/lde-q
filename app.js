@@ -1004,8 +1004,34 @@ function mountTalk(n) {
   setTimeout(readHyvorUser, 4000);
 }
 
+function lockPage(on) {
+  const body = document.body;
+  if (on) {
+    if (body.dataset.lock === "1") return;
+    const y = window.scrollY || document.documentElement.scrollTop || 0;
+    body.dataset.lock = "1";
+    body.dataset.lockY = String(y);
+    body.style.position = "fixed";
+    body.style.top = `-${y}px`;
+    body.style.left = "0";
+    body.style.right = "0";
+    body.style.width = "100%";
+    return;
+  }
+  if (body.dataset.lock !== "1") return;
+  const y = Number(body.dataset.lockY || 0);
+  body.dataset.lock = "";
+  body.style.position = "";
+  body.style.top = "";
+  body.style.left = "";
+  body.style.right = "";
+  body.style.width = "";
+  window.scrollTo(0, y);
+}
+
 function render() {
   applyTheme();
+  lockPage(state.showSettings || state.showOnboard);
   const r = parseHash();
   const root = document.getElementById("app");
   root.className = "app";
