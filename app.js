@@ -104,6 +104,7 @@ const ui = {
     fontSm: "Pequena",
     fontMd: "Média",
     fontLg: "Grande",
+    loading: "Carregando…",
   },
   "en-US": {
     book: "The Spirits’ Book",
@@ -194,6 +195,7 @@ const ui = {
     fontSm: "Small",
     fontMd: "Medium",
     fontLg: "Large",
+    loading: "Loading…",
   },
 };
 
@@ -1733,15 +1735,28 @@ function fitViewport() {
   root.style.setProperty("--vv-bottom", Math.round(gap) + "px");
 }
 
+function hideSplash() {
+  const el = document.getElementById("boot-splash");
+  if (!el || el.hidden || el.classList.contains("is-gone")) return;
+  const label = el.querySelector("p");
+  if (label) label.textContent = t("loading");
+  el.classList.add("is-gone");
+  setTimeout(() => { el.hidden = true; }, 350);
+}
+
 async function boot() {
   fitViewport();
   window.visualViewport && window.visualViewport.addEventListener("resize", fitViewport);
   window.visualViewport && window.visualViewport.addEventListener("scroll", fitViewport);
   window.addEventListener("resize", fitViewport);
   applyTheme();
+  const splash = document.getElementById("boot-splash");
+  if (splash) {
+    const label = splash.querySelector("p");
+    if (label) label.textContent = t("loading");
+  }
   const root = document.getElementById("app");
   root.className = "app";
-  root.innerHTML = "<main class='home'><p class='sub'>Carregando…</p></main>";
   try {
     const res = await fetch("data/questions.json");
     if (!res.ok) throw new Error("catalog " + res.status);
@@ -1758,6 +1773,7 @@ async function boot() {
     root.addEventListener("keydown", onKey);
     window.addEventListener("hashchange", render);
     render();
+    hideSplash();
     if (localStorage.getItem(DRIVE_OK_KEY) === "1") connectDrive(true);
     document.addEventListener("visibilitychange", () => {
       if (document.visibilityState === "visible" && driveToken) pullAndMerge(false);
@@ -1766,6 +1782,7 @@ async function boot() {
       navigator.serviceWorker.register("sw.js").catch(() => {});
     }
   } catch (err) {
+    hideSplash();
     root.innerHTML = "<main class='home'><p>Falha ao carregar o catálogo.</p><p class='sub'>" + String(err) + "</p></main>";
   }
 }
