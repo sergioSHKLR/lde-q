@@ -3,6 +3,14 @@ import { hydrateIcons } from "./icons.js";
 const HYVOR_WEBSITE_ID = "16128";
 const APP_VERSION = "0.2.0";
 const REPO_URL = "https://github.com/sergioSHKLR/lde-q";
+const GRIFO = [
+  { id: "gold", hex: "#f3e08a", labelPt: "Ouro", labelEn: "Gold" },
+  { id: "green", hex: "#b7e0b4", labelPt: "Verde", labelEn: "Green" },
+  { id: "blue", hex: "#b4d4f0", labelPt: "Azul", labelEn: "Blue" },
+  { id: "rose", hex: "#f0c0c8", labelPt: "Rosa", labelEn: "Rose" },
+  { id: "violet", hex: "#d4c0f0", labelPt: "Lilás", labelEn: "Violet" },
+];
+const GRIFO_IDS = GRIFO.map((c) => c.id);
 const MARKS_KEY = "lde-q-marks-v1";
 const HISTORY_KEY = "lde-q-history-v1";
 
@@ -55,6 +63,7 @@ const ui = {
     import: "Importar caderno",
     highlightHint: "Selecione texto e clique Grifar",
     highlight: "Grifar",
+    grifoColors: "Cores do grifo",
     bookCrumb: "LDE",
     filter: "Filtrar…",
     search: "Buscar questões…",
@@ -117,6 +126,7 @@ const ui = {
     import: "Import notebook",
     highlightHint: "Select text, then tap Highlight",
     highlight: "Highlight",
+    grifoColors: "Highlight colors",
     bookCrumb: "LDE",
     filter: "Filter…",
     searchBtn: "Search",
@@ -146,9 +156,9 @@ const state = {
 
 function loadPref() {
   try {
-    return { theme: "system", locale: "pt-BR", showAnswers: false, ...JSON.parse(localStorage.getItem(PREF_KEY) || "{}") };
+    return { theme: "system", locale: "pt-BR", showAnswers: false, grifoColor: "gold", colorLabels: {}, ...JSON.parse(localStorage.getItem(PREF_KEY) || "{}") };
   } catch {
-    return { theme: "system", locale: "pt-BR", showAnswers: false };
+    return { theme: "system", locale: "pt-BR", showAnswers: false, grifoColor: "gold", colorLabels: {} };
   }
 }
 function savePref() {
@@ -184,6 +194,16 @@ function rememberQ(n) {
   state.history = [n, ...state.history.filter((x) => x !== n)].slice(0, 20);
   saveHistory();
 }
+function colorId(id) {
+  return GRIFO_IDS.includes(id) ? id : "gold";
+}
+function colorLabel(id) {
+  const c = GRIFO.find((x) => x.id === id);
+  const custom = state.pref.colorLabels && state.pref.colorLabels[id];
+  if (custom && String(custom).trim()) return String(custom).trim();
+  if (!c) return id;
+  return state.pref.locale === "en-US" ? c.labelEn : c.labelPt;
+}
 function t(key) {
   const loc = state.pref.locale === "en-US" ? "en-US" : "pt-BR";
   const bag = ui[loc] || ui["pt-BR"];
@@ -203,7 +223,11 @@ function parseHash() {
   const parts = raw.split("/").filter(Boolean);
   if (!parts.length) return { name: "home" };
   if (parts[0] === "q" && parts[1]) return { name: "q", n: normalizeN(parts[1]) };
-  if (parts[0] === "caderno") return { name: "caderno", filter: parts[1] === "fav" || parts[1] === "marks" ? parts[1] : "all" };
+  if (parts[0] === "caderno") {
+    const f = parts[1] || "all";
+    if (f === "fav" || f === "marks" || f === "all" || GRIFO_IDS.includes(f)) return { name: "caderno", filter: f };
+    return { name: "caderno", filter: "all" };
+  }
   if (parts[0] === "fav") return { name: "caderno", filter: "fav" };
   if (parts[0] === "marks") return { name: "caderno", filter: "marks" };
   if (parts[0] === "parte") return { name: "parte", parte: decodeURIComponent(parts.slice(1).join("/")) };
@@ -428,7 +452,8 @@ function applyHighlights(text, spans) {
   for (const s of spans) {
     const needle = esc(s.text || "");
     if (!needle) continue;
-    out = out.replace(needle, `<mark class="mark">${needle}</mark>`);
+    const col = colorId(s.color);
+    out = out.replace(needle, `<mark class="mark mark-${col}">${needle}</mark>`);
   }
   return out;
 }
@@ -471,7 +496,10 @@ function paintQ(n) {
           ? `${spirit ? `<section class="block"><h2>${t("spirit")}</h2>${spirit}</section>` : ""}
       ${kardec ? `<section class="block"><h2>${t("kardec")}</h2>${kardec}</section>` : ""}
       <p class="hint">${t("highlightHint")}</p>
-      <button class="chip" data-act="highlight"><i data-icon="highlighter"></i> ${t("highlight")}</button>`
+      <div class="grifo-row">
+        ${GRIFO.map((c) => `<button class="swatch ${colorId(state.pref.grifoColor) === c.id ? "on" : ""}" data-act="grifo-color" data-color="${c.id}" title="${esc(colorLabel(c.id))}" style="--sw:${c.hex}"></button>`).join("")}
+        <button class="chip" data-act="highlight"><i data-icon="highlighter"></i> ${t("highlight")}</button>
+      </div>`
           : ``
       }
       <label class="hint" for="note">${t("note")}</label>
@@ -529,16 +557,19 @@ function paintList(filter) {
   const qAll = state.data.questions;
   const isFav = (q) => state.marks.favs.includes(q.n);
   const isMark = (q) => (state.marks.highlights[q.n] || []).length || String(state.marks.notes[q.n] || "").trim();
+  const isColor = (q) => (state.marks.highlights[q.n] || []).some((h) => colorId(h.color) === filter);
   let rows = qAll.filter((q) => isFav(q) || isMark(q));
   if (filter === "fav") rows = qAll.filter(isFav);
   if (filter === "marks") rows = qAll.filter(isMark);
-  const empty = filter === "fav" ? t("emptyFav") : filter === "marks" ? t("emptyMarks") : t("emptyAll");
+  if (GRIFO_IDS.includes(filter)) rows = qAll.filter(isColor);
+  const empty = filter === "fav" ? t("emptyFav") : filter === "marks" || GRIFO_IDS.includes(filter) ? t("emptyMarks") : t("emptyAll");
   return `${topBar(`<strong>${esc(t("notebook"))}</strong>`)}
     <main class="page">
       <div class="filters">
         <button class="chip ${filter === "all" ? "on" : ""}" data-go="#/caderno">${t("allMarks")}</button>
         <button class="chip ${filter === "fav" ? "on" : ""}" data-go="#/caderno/fav">${t("fav")}</button>
         <button class="chip ${filter === "marks" ? "on" : ""}" data-go="#/caderno/marks">${t("marks")}</button>
+        ${GRIFO.map((c) => `<button class="chip swatch-chip ${filter === c.id ? "on" : ""}" data-go="#/caderno/${c.id}" title="${esc(colorLabel(c.id))}"><span class="swatch" style="--sw:${c.hex}"></span>${esc(colorLabel(c.id))}</button>`).join("")}
       </div>
       <label class="search-wrap">
         <input class="search" data-act="filter" placeholder="${t("filter")}" />
@@ -683,6 +714,10 @@ function settingsModal() {
         <button class="chip ${state.pref.showAnswers ? "" : "on"}" data-act="answers-set" data-on="0">${t("hideAnswers")}</button>
         <button class="chip ${state.pref.showAnswers ? "on" : ""}" data-act="answers-set" data-on="1">${t("showAnswers")}</button>
       </div>
+      <p class="hint">${t("grifoColors")}</p>
+      <div class="color-labels">
+        ${GRIFO.map((c) => `<label class="color-label"><span class="swatch" style="--sw:${c.hex}"></span><input data-act="color-label" data-color="${c.id}" value="${esc(colorLabel(c.id))}" /></label>`).join("")}
+      </div>
       <p class="hint">${t("hyvorAccount")}</p>
       ${profile}
       <p class="hint">${t("repo")}</p>
@@ -813,6 +848,13 @@ function onClick(e) {
       render();
       return;
     }
+    if (a === "grifo-color") {
+      e.preventDefault();
+      state.pref.grifoColor = colorId(actEl.dataset.color);
+      savePref();
+      render();
+      return;
+    }
     if (a === "theme-set") {
       e.preventDefault();
       state.pref.theme = actEl.dataset.theme || "system";
@@ -899,7 +941,7 @@ function onClick(e) {
     const text = sel.trim();
     if (!text || r.name !== "q") return;
     const arr = state.marks.highlights[r.n] || [];
-    if (!arr.some((h) => h.text === text)) arr.push({ text });
+    if (!arr.some((h) => h.text === text)) arr.push({ text, color: colorId(state.pref.grifoColor) });
     state.marks.highlights[r.n] = arr;
     saveMarks();
     render();
@@ -955,6 +997,12 @@ function onInput(e) {
         el.setSelectionRange(pos, pos);
       } catch {}
     }
+  }
+  if (e.target.dataset.act === "color-label") {
+    const id = e.target.dataset.color;
+    if (!GRIFO_IDS.includes(id)) return;
+    state.pref.colorLabels = { ...(state.pref.colorLabels || {}), [id]: e.target.value };
+    savePref();
   }
   if (e.target.dataset.act === "filter") {
     const q = fold(e.target.value).trim();

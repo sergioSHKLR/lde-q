@@ -208,6 +208,11 @@ h1 {
 .block p { margin: 0; }
 .block p + p { margin-top: .6rem; }
 .mark { background: var(--mark); }
+.mark-gold { background: #f3e08a; color: inherit; }
+.mark-green { background: #b7e0b4; color: inherit; }
+.mark-blue { background: #b4d4f0; color: inherit; }
+.mark-rose { background: #f0c0c8; color: inherit; }
+.mark-violet { background: #d4c0f0; color: inherit; }
 .list { display: grid; gap: .65rem; }
 .row {
   display: grid;
@@ -463,9 +468,43 @@ button.row {
   border-radius: 999px;
   object-fit: cover;
 }
-.version {
+html[data-theme="dark"] .mark-gold { background: #6b5a1e; }
+html[data-theme="dark"] .mark-green { background: #2d5a32; }
+html[data-theme="dark"] .mark-blue { background: #2a4a6b; }
+html[data-theme="dark"] .mark-rose { background: #6b2a38; }
+html[data-theme="dark"] .mark-violet { background: #4a2d6b; }
+.swatch {
+  width: 1.15rem;
+  height: 1.15rem;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: var(--sw);
+  padding: 0;
+  cursor: pointer;
+  display: inline-block;
+  flex: 0 0 auto;
+}
+button.swatch.on { outline: 2px solid var(--ink); outline-offset: 2px; }
+.grifo-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: .4rem;
+  margin: .35rem 0 .8rem;
+}
+.swatch-chip { gap: .4rem; }
+.color-labels { display: grid; gap: .45rem; margin: 0 0 .8rem; }
+.color-label {
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+}
+.color-label input {
+  flex: 1;
   font-family: var(--sans);
-  font-size: .82rem;
-  color: var(--muted);
-  margin: 0;
+  font-size: .85rem;
+  padding: .35rem .5rem;
+  border: 1px solid var(--line);
+  border-radius: .45rem;
+  background: var(--card);
 }
