@@ -34,6 +34,7 @@ const ui = {
     themeDark: "Escuro",
     langLabel: "Idioma",
     repo: "Repositório",
+    legal: "Aviso",
     version: "Versão",
     hyvorAccount: "Perfil Hyvor",
     hyvorOff: "Abre uma questão e entra no Hyvor para ver o perfil aqui.",
@@ -96,6 +97,7 @@ const ui = {
     themeDark: "Dark",
     langLabel: "Language",
     repo: "Repository",
+    legal: "Notice",
     version: "Version",
     hyvorAccount: "Hyvor profile",
     hyvorOff: "Open a question and sign in to Hyvor to see the profile here.",
@@ -720,6 +722,8 @@ function settingsModal() {
       </div>
       <p class="hint">${t("hyvorAccount")}</p>
       ${profile}
+      <p class="hint">${t("legal")}</p>
+      <a class="chip" href="https://shklr.org/" target="_blank" rel="noopener">shklr.org</a>
       <p class="hint">${t("repo")}</p>
       <a class="chip" href="${REPO_URL}" target="_blank" rel="noopener">github.com/sergioSHKLR/lde-q</a>
       <p class="hint">${t("version")}</p>
