@@ -197,7 +197,20 @@ h1 {
   gap: .5rem;
   margin-bottom: .35rem;
 }
-.comments-head .hint { margin: 0; }
+.legal-foot {
+  text-align: center;
+  font-family: var(--sans);
+  font-size: .72rem;
+  color: var(--muted);
+  margin: 1.4rem 0 0.4rem;
+}
+.legal-foot a, .legal-inline a { color: var(--muted); text-decoration: underline; text-underline-offset: 2px; }
+.legal-inline {
+  font-family: var(--sans);
+  font-size: .72rem;
+  color: var(--muted);
+  margin: 0 0 .55rem;
+}
 .block {
   background: var(--card);
   border: 1px solid var(--line);

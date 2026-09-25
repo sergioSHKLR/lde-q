@@ -3,6 +3,7 @@ import { hydrateIcons } from "./icons.js";
 const HYVOR_WEBSITE_ID = "16128";
 const APP_VERSION = "0.2.0";
 const REPO_URL = "https://github.com/sergioSHKLR/lde-q";
+const LEGAL_URL = "https://shklr.org/";
 const GRIFO = [
   { id: "gold", hex: "#f3e08a", labelPt: "Ouro", labelEn: "Gold" },
   { id: "green", hex: "#b7e0b4", labelPt: "Verde", labelEn: "Green" },
@@ -35,6 +36,8 @@ const ui = {
     langLabel: "Idioma",
     repo: "Repositório",
     legal: "Aviso",
+    legalFoot: "Texto em domínio público. Aviso legal",
+    commentPublic: "Ao comentar, o texto fica público.",
     version: "Versão",
     hyvorAccount: "Perfil Hyvor",
     hyvorOff: "Abre uma questão e entra no Hyvor para ver o perfil aqui.",
@@ -98,6 +101,8 @@ const ui = {
     langLabel: "Language",
     repo: "Repository",
     legal: "Notice",
+    legalFoot: "Public-domain text. Legal notice",
+    commentPublic: "Comments are public.",
     version: "Version",
     hyvorAccount: "Hyvor profile",
     hyvorOff: "Open a question and sign in to Hyvor to see the profile here.",
@@ -437,6 +442,7 @@ function paintHome() {
         })()
       }
     </main>
+    <p class="legal-foot"><a href="${LEGAL_URL}" target="_blank" rel="noopener">${t("legalFoot")}</a></p>
     ${tabBar("home")}`;
 }
 
@@ -507,6 +513,7 @@ function paintQ(n) {
           <div class="hint">${t("comments")}</div>
           <button class="chip" data-act="share" title="${t("share")}"><i data-icon="share-2"></i> ${t("share")}</button>
         </div>
+        <p class="legal-inline">${t("commentPublic")} <a href="${LEGAL_URL}" target="_blank" rel="noopener">${t("legal")}</a>.</p>
       </aside>
     </main>
     ${tabBar("q")}`;
@@ -723,7 +730,7 @@ function settingsModal() {
       <p class="hint">${t("hyvorAccount")}</p>
       ${profile}
       <p class="hint">${t("legal")}</p>
-      <a class="chip" href="https://shklr.org/" target="_blank" rel="noopener">shklr.org</a>
+      <a class="chip" href="${LEGAL_URL}" target="_blank" rel="noopener">shklr.org</a>
       <p class="hint">${t("repo")}</p>
       <a class="chip" href="${REPO_URL}" target="_blank" rel="noopener">github.com/sergioSHKLR/lde-q</a>
       <p class="hint">${t("version")}</p>
