@@ -41,7 +41,7 @@ const ui = {
     import: "Importar caderno",
     highlightHint: "Selecione texto e clique Grifar",
     highlight: "Grifar",
-    bookCrumb: "Livro",
+    bookCrumb: "LDE",
     filter: "Filtrar…",
     search: "Buscar questões…",
     searchEmpty: "Nada encontrado.",
