@@ -20,3 +20,13 @@
 .led.on {
   background: #2e7d32;
 }
+.version-line {
+  display: flex;
+  align-items: center;
+  gap: .55rem;
+  flex-wrap: wrap;
+}
+.version-line .chip {
+  font-size: .72rem;
+  padding: .2rem .6rem;
+}
