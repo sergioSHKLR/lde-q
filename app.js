@@ -782,8 +782,8 @@ function paintList(filter) {
     <main class="page caderno ${state.filePanel ? "arquivo-open" : ""}">
       <div class="filters">
         <button class="chip ${filter === "all" ? "on" : ""}" data-go="#/caderno">${t("allMarks")}</button>
-        <button class="chip ${filter === "fav" ? "on" : ""}" data-go="#/caderno/fav">${t("fav")}</button>
-        <button class="chip ${filter === "marks" || GRIFO_IDS.includes(filter) ? "on" : ""}" data-go="#/caderno/marks">${t("marks")}</button>
+        <button class="chip ${filter === "fav" ? "on" : ""}" data-go="#/caderno/fav"><i data-icon="star"></i> ${t("fav")}</button>
+        <button class="chip ${filter === "marks" || GRIFO_IDS.includes(filter) ? "on" : ""}" data-go="#/caderno/marks"><i data-icon="pencil"></i> ${t("marks")}</button>
       </div>
       ${
         filter === "marks" || GRIFO_IDS.includes(filter)
