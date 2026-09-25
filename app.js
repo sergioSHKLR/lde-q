@@ -65,6 +65,7 @@ const ui = {
     next: "Seguinte",
     showAnswers: "Mostrar respostas",
     hideAnswers: "Ocultar respostas",
+    answersDefault: "Respostas",
     answersHidden: "Respostas ocultas — estuda a pergunta primeiro.",
   },
   "en-US": {
