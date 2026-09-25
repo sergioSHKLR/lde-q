@@ -78,6 +78,7 @@ const ui = {
     fileLocal: "Só neste aparelho — desinstalar apaga.",
     fileLinked: "Fora do app. Sobrevive a desinstalar.",
     fileUnsupported: "Este navegador não guarda arquivo fora do app. Use Exportar.",
+    fileSection: "Arquivo",
     highlightHint: "Escolha cor, selecione texto e clique Grifar",
     highlight: "Grifar",
     grifoColors: "Cores do grifo",
@@ -158,6 +159,7 @@ const ui = {
     fileLocal: "This device only — uninstall wipes it.",
     fileLinked: "Outside the app. Survives uninstall.",
     fileUnsupported: "This browser cannot keep a file outside the app. Use Export.",
+    fileSection: "File",
     highlightHint: "Pick a color, select text, then tap Highlight",
     highlight: "Highlight",
     grifoColors: "Highlight colors",
@@ -191,6 +193,7 @@ const state = {
   fileHandle: null,
   fileName: "",
   fileNeedsGrant: false,
+  filePanel: false,
 };
 
 function loadPref() {
@@ -794,7 +797,17 @@ function paintList(filter) {
         <input class="search" data-act="filter" placeholder="${t("filter")}" />
         <button class="clear" type="button" data-act="clear-filter" hidden aria-label="Limpar">×</button>
       </label>
-      <div class="index-actions">
+      <div class="list" data-list="caderno">
+        ${rows.length ? rows.map((q) => rowHTML(q, { starToggle: true })).join("") : `<p class="empty">${empty}</p>`}
+      </div>
+      <section class="arquivo ${state.filePanel ? "open" : ""}">
+        <button class="arquivo-head" data-act="toggle-file">
+          <span><strong>${t("fileSection")}</strong><small>${fileStatus}</small></span>
+          <i data-icon="chevron-right"></i>
+        </button>
+        ${
+          state.filePanel
+            ? `<div class="index-actions">
         ${
           canFile
             ? `<button class="chip" data-act="file-save">${t("fileSave")}</button>
@@ -803,11 +816,10 @@ function paintList(filter) {
         }
         <button class="chip" data-act="export">${t("export")}</button>
         <label class="chip"><input type="file" accept="application/json" hidden data-act="import" />${t("import")}</label>
-      </div>
-      <p class="hint">${fileStatus}</p>
-      <div class="list" data-list="caderno">
-        ${rows.length ? rows.map((q) => rowHTML(q, { starToggle: true })).join("") : `<p class="empty">${empty}</p>`}
-      </div>
+      </div>`
+            : ""
+        }
+      </section>
     </main>
     ${tabBar("caderno")}`;
 }
@@ -1277,6 +1289,12 @@ function onClick(e) {
     state.marks.highlights[r.n] = arr;
     saveMarks();
     render();
+  }
+  if (a === "toggle-file") {
+    e.preventDefault();
+    state.filePanel = !state.filePanel;
+    render();
+    return;
   }
   if (a === "file-save") {
     pickCaderno(true);

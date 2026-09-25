@@ -426,6 +426,40 @@ button.row {
   line-height: 1.2;
   margin: .2rem 2.4rem 0;
 }
+.arquivo {
+  margin-top: 1.4rem;
+  border-top: 1px solid var(--line);
+  padding-top: .7rem;
+}
+.arquivo-head {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: .6rem;
+  background: none;
+  border: 0;
+  padding: .15rem 0;
+  text-align: left;
+  cursor: pointer;
+  color: inherit;
+}
+.arquivo-head strong {
+  display: block;
+  font-family: var(--sans);
+  font-size: .95rem;
+  font-weight: 700;
+}
+.arquivo-head small {
+  display: block;
+  margin-top: .1rem;
+  color: var(--muted);
+  font-family: var(--sans);
+  font-size: .72rem;
+  font-weight: 500;
+}
+.arquivo-head [data-icon] { color: var(--muted); }
+.arquivo.open .arquivo-head [data-icon] { transform: rotate(90deg); }
 .index-actions {
   display: flex;
   flex-wrap: wrap;
@@ -433,6 +467,7 @@ button.row {
   margin: .7rem 0 .35rem;
   justify-content: center;
 }
+.arquivo .index-actions { justify-content: flex-start; }
 .index-parte h2 {
   font-family: var(--serif);
   font-size: 1.05rem;
