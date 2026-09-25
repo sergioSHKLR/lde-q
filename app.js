@@ -72,6 +72,13 @@ const ui = {
     share: "Compartilhe",
     export: "Exportar caderno",
     import: "Importar caderno",
+    fileSave: "Guardar fora do app",
+    fileOpen: "Abrir arquivo",
+    fileResume: "Retomar arquivo",
+    fileHere: "Arquivo",
+    fileLocal: "Só neste aparelho — desinstalar apaga.",
+    fileLinked: "Fora do app. Sobrevive a desinstalar.",
+    fileUnsupported: "Este navegador não guarda arquivo fora do app. Use Exportar.",
     highlightHint: "Selecione texto, escolha cor e clique Grifar",
     highlight: "Grifar",
     grifoColors: "Cores do grifo",
@@ -146,6 +153,13 @@ const ui = {
     share: "Share",
     export: "Export notebook",
     import: "Import notebook",
+    fileSave: "Save outside the app",
+    fileOpen: "Open file",
+    fileResume: "Resume file",
+    fileHere: "File",
+    fileLocal: "This device only — uninstall wipes it.",
+    fileLinked: "Outside the app. Survives uninstall.",
+    fileUnsupported: "This browser cannot keep a file outside the app. Use Export.",
     highlightHint: "Select text, pick a color, then tap Highlight",
     highlight: "Highlight",
     grifoColors: "Highlight colors",
@@ -176,6 +190,9 @@ const state = {
   hyvorUser: null,
   noteOpen: false,
   showOnboard: !localStorage.getItem(ONBOARD_KEY),
+  fileHandle: null,
+  fileName: "",
+  fileNeedsGrant: false,
 };
 
 function loadPref() {
@@ -204,6 +221,131 @@ function loadMarks() {
 }
 function saveMarks() {
   localStorage.setItem(MARKS_KEY, JSON.stringify(state.marks));
+  scheduleFileWrite();
+}
+let fileTimer = 0;
+function scheduleFileWrite() {
+  if (!state.fileHandle || state.fileNeedsGrant) return;
+  clearTimeout(fileTimer);
+  fileTimer = setTimeout(() => {
+    writeCadernoFile().catch(() => {});
+  }, 400);
+}
+function idb() {
+  return new Promise((resolve, reject) => {
+    const req = indexedDB.open("lde-q-files", 1);
+    req.onupgradeneeded = () => req.result.createObjectStore("handles");
+    req.onsuccess = () => resolve(req.result);
+    req.onerror = () => reject(req.error);
+  });
+}
+async function idbPutHandle(handle) {
+  const db = await idb();
+  await new Promise((resolve, reject) => {
+    const tx = db.transaction("handles", "readwrite");
+    tx.objectStore("handles").put(handle, "caderno");
+    tx.oncomplete = () => resolve();
+    tx.onerror = () => reject(tx.error);
+  });
+}
+async function idbGetHandle() {
+  const db = await idb();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction("handles", "readonly");
+    const req = tx.objectStore("handles").get("caderno");
+    req.onsuccess = () => resolve(req.result || null);
+    req.onerror = () => reject(req.error);
+  });
+}
+function applyMarks(data) {
+  state.marks = { v: 1, favs: [], highlights: {}, notes: {}, ...data };
+  localStorage.setItem(MARKS_KEY, JSON.stringify(state.marks));
+}
+async function writeCadernoFile() {
+  const handle = state.fileHandle;
+  if (!handle) return;
+  const perm = await handle.queryPermission({ mode: "readwrite" });
+  if (perm !== "granted") {
+    state.fileNeedsGrant = true;
+    return;
+  }
+  const w = await handle.createWritable();
+  await w.write(JSON.stringify(state.marks, null, 2));
+  await w.close();
+  state.fileNeedsGrant = false;
+}
+async function readCadernoFile() {
+  const file = await state.fileHandle.getFile();
+  const txt = (await file.text()).trim();
+  if (!txt) {
+    await writeCadernoFile();
+    return;
+  }
+  applyMarks(JSON.parse(txt));
+}
+async function rememberHandle(handle) {
+  state.fileHandle = handle;
+  state.fileName = handle.name || "lde-q-marks.json";
+  state.fileNeedsGrant = false;
+  await idbPutHandle(handle);
+}
+async function pickCaderno(create) {
+  try {
+    const saveOk = typeof window.showSaveFilePicker === "function";
+    const openOk = typeof window.showOpenFilePicker === "function";
+    if (!saveOk && !openOk) {
+      toast(t("fileUnsupported"));
+      return;
+    }
+    const types = [{ description: "Caderno LDE", accept: { "application/json": [".json"] } }];
+    let handle;
+    if (create && saveOk) {
+      handle = await window.showSaveFilePicker({ suggestedName: "lde-q-marks.json", types });
+    } else if (openOk) {
+      const picked = await window.showOpenFilePicker({ types, multiple: false });
+      handle = picked[0];
+    } else {
+      toast(t("fileUnsupported"));
+      return;
+    }
+    const perm = await handle.requestPermission({ mode: "readwrite" });
+    if (perm !== "granted") return;
+    await rememberHandle(handle);
+    if (create) await writeCadernoFile();
+    else await readCadernoFile();
+    render();
+  } catch (err) {
+    if (err && err.name === "AbortError") return;
+    toast(String(err && err.message ? err.message : err));
+  }
+}
+async function resumeCaderno() {
+  const handle = state.fileHandle;
+  if (!handle) return pickCaderno(false);
+  try {
+    const perm = await handle.requestPermission({ mode: "readwrite" });
+    if (perm !== "granted") return;
+    state.fileNeedsGrant = false;
+    await readCadernoFile();
+    render();
+  } catch (err) {
+    if (err && err.name === "AbortError") return;
+    toast(String(err && err.message ? err.message : err));
+  }
+}
+async function restoreCadernoFile() {
+  try {
+    const handle = await idbGetHandle();
+    if (!handle) return;
+    state.fileHandle = handle;
+    state.fileName = handle.name || "lde-q-marks.json";
+    const perm = await handle.queryPermission({ mode: "readwrite" });
+    if (perm !== "granted") {
+      state.fileNeedsGrant = true;
+      return;
+    }
+    await readCadernoFile();
+  } catch {}
 }
 function loadHistory() {
   try {
@@ -629,6 +771,10 @@ function paintList(filter) {
   if (filter === "marks") rows = qAll.filter(isMark);
   if (GRIFO_IDS.includes(filter)) rows = qAll.filter(isColor);
   const empty = filter === "fav" ? t("emptyFav") : filter === "marks" || GRIFO_IDS.includes(filter) ? t("emptyMarks") : t("emptyAll");
+  const canFile = typeof window.showSaveFilePicker === "function" || typeof window.showOpenFilePicker === "function";
+  const fileStatus = state.fileName
+    ? `${t("fileHere")}: ${esc(state.fileName)}. ${state.fileNeedsGrant ? t("fileResume") : t("fileLinked")}`
+    : t("fileLocal");
   return `${topBar(`<strong>${esc(t("notebook"))}</strong>`)}
     <main class="page">
       <div class="filters">
@@ -649,9 +795,16 @@ function paintList(filter) {
         <button class="clear" type="button" data-act="clear-filter" hidden aria-label="Limpar">×</button>
       </label>
       <div class="index-actions">
+        ${
+          canFile
+            ? `<button class="chip" data-act="file-save">${t("fileSave")}</button>
+        <button class="chip" data-act="${state.fileNeedsGrant ? "file-resume" : "file-open"}">${state.fileNeedsGrant ? t("fileResume") : t("fileOpen")}</button>`
+            : ""
+        }
         <button class="chip" data-act="export">${t("export")}</button>
         <label class="chip"><input type="file" accept="application/json" hidden data-act="import" />${t("import")}</label>
       </div>
+      <p class="hint">${fileStatus}</p>
       <div class="list" data-list="caderno">
         ${rows.length ? rows.map((q) => rowHTML(q, { starToggle: true })).join("") : `<p class="empty">${empty}</p>`}
       </div>
@@ -1087,6 +1240,18 @@ function onClick(e) {
     saveMarks();
     render();
   }
+  if (a === "file-save") {
+    pickCaderno(true);
+    return;
+  }
+  if (a === "file-open") {
+    pickCaderno(false);
+    return;
+  }
+  if (a === "file-resume") {
+    resumeCaderno();
+    return;
+  }
   if (a === "export") {
     const blob = new Blob([JSON.stringify(state.marks, null, 2)], { type: "application/json" });
     const aEl = document.createElement("a");
@@ -1177,6 +1342,7 @@ async function boot() {
     state.data = await res.json();
     for (const q of state.data.questions) state.byN.set(q.n, q);
     state.lastQ = state.history.find((n) => state.byN.has(n)) || "1";
+    await restoreCadernoFile();
     root.addEventListener("click", onClick);
     root.addEventListener("change", onChange);
     root.addEventListener("input", onInput);
