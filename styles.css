@@ -377,6 +377,12 @@ button.row {
 .index-head {
   text-align: center;
   margin: .4rem 0 1.1rem;
+  position: relative;
+}
+.settings-corner {
+  position: absolute;
+  top: 0;
+  right: 0;
 }
 .book-title {
   font-family: var(--serif);
