@@ -1,6 +1,8 @@
 import { hydrateIcons } from "./icons.js";
 
 const HYVOR_WEBSITE_ID = "16128";
+const APP_VERSION = "0.2.0";
+const REPO_URL = "https://github.com/sergioSHKLR/lde-q";
 const MARKS_KEY = "lde-q-marks-v1";
 const HISTORY_KEY = "lde-q-history-v1";
 
@@ -18,7 +20,18 @@ const ui = {
     sections: "secções",
     jumpPh: "22 ou 22a",
     study: "Leia · Comente · Compartilhe",
+    settings: "Ajustes",
     theme: "Tema",
+    themeSystem: "Sistema",
+    themeLight: "Claro",
+    themeDark: "Escuro",
+    langLabel: "Idioma",
+    repo: "Repositório",
+    version: "Versão",
+    hyvorAccount: "Perfil Hyvor",
+    hyvorOff: "Abre uma questão e entra no Hyvor para ver o perfil aqui.",
+    hyvorOut: "Sair do Hyvor",
+    close: "Fechar",
     langOff: "EN-US quando o catálogo inglês existir",
     spirit: "Espíritos",
     kardec: "Kardec",
@@ -67,7 +80,18 @@ const ui = {
     sections: "sections",
     jumpPh: "22 or 22a",
     study: "Read · Comment · Share",
+    settings: "Settings",
     theme: "Theme",
+    themeSystem: "System",
+    themeLight: "Light",
+    themeDark: "Dark",
+    langLabel: "Language",
+    repo: "Repository",
+    version: "Version",
+    hyvorAccount: "Hyvor profile",
+    hyvorOff: "Open a question and sign in to Hyvor to see the profile here.",
+    hyvorOut: "Sign out of Hyvor",
+    close: "Close",
     langOff: "EN-US when the English catalog exists",
     spirit: "Spirits",
     kardec: "Kardec",
@@ -114,6 +138,8 @@ const state = {
   histFilter: "",
   history: loadHistory(),
   panel: null,
+  showSettings: false,
+  hyvorUser: null,
 };
 
 function loadPref() {
@@ -208,6 +234,7 @@ function topBar(extra = "") {
   return `<header class="top">
     <div class="grow">${extra}</div>
     ${onHome ? "" : `<button class="iconbtn" data-act="open-search" title="${t("search")}"><i data-icon="search"></i></button>`}
+    <button class="iconbtn" data-act="open-settings" title="${t("settings")}"><i data-icon="settings"></i></button>
   </header>`;
 }
 
@@ -312,7 +339,8 @@ function indexByParte() {
 function paintHome() {
   const groups = indexByParte();
   const hist = state.history.map((n) => state.byN.get(n)).filter(Boolean);
-  return `<main class="page index">
+  return `${topBar()}
+    <main class="page index">
       <div class="index-head">
         <div class="kicker"><i data-icon="sparkles" data-icon-size="22" class="brand"></i></div>
         <h1 class="book-title">${t("book")}</h1>
@@ -510,8 +538,6 @@ function paintList(filter) {
       <div class="index-actions">
         <button class="chip" data-act="export">${t("export")}</button>
         <label class="chip"><input type="file" accept="application/json" hidden data-act="import" />${t("import")}</label>
-        <button class="iconbtn" data-act="theme" title="${t("theme")}"><i data-icon="${document.documentElement.dataset.theme === "dark" ? "moon" : "sun"}"></i></button>
-        <button class="lang" data-act="lang" data-off="${state.data?.enReady ? "0" : "1"}" ${state.data?.enReady ? "" : "disabled"} title="${t("langOff")}"><i data-icon="lang-pt" data-icon-size="16"></i><span>/</span><i data-icon="lang-en" data-icon-size="16"></i></button>
       </div>
       <div class="list" data-list="caderno">
         ${rows.length ? rows.map((q) => rowHTML(q, { starToggle: true })).join("") : `<p class="empty">${empty}</p>`}
@@ -602,6 +628,59 @@ function paintSec(name) {
     ${tabBar("home")}`;
 }
 
+function readHyvorUser() {
+  const el = document.querySelector("hyvor-talk-comments");
+  try {
+    const user = el && el.api && el.api.auth && el.api.auth.user ? el.api.auth.user() : null;
+    if (user) state.hyvorUser = user;
+  } catch {}
+}
+
+function settingsModal() {
+  if (!state.showSettings) return "";
+  const theme = state.pref.theme || "system";
+  const enOn = !!(state.data && state.data.enReady);
+  const user = state.hyvorUser;
+  const pic = user && user.picture_url ? `<img class="avatar" src="${esc(user.picture_url)}" alt="" />` : "";
+  const profile = user
+    ? `<div class="hyvor-row">
+        ${pic}
+        <div>
+          <strong>${esc(user.name || user.username || "")}</strong>
+          <small>${esc(user.username ? "@" + user.username : user.type || "hyvor")}</small>
+        </div>
+        ${user.username ? `<a class="chip" href="https://hyvor.com/@${encodeURIComponent(user.username)}" target="_blank" rel="noopener">Hyvor</a>` : ""}
+        <button class="chip" data-act="hyvor-out">${t("hyvorOut")}</button>
+      </div>`
+    : `<p class="hint">${t("hyvorOff")}</p>`;
+  return `<div class="modal-back" data-act="close-settings">
+    <div class="modal" role="dialog" aria-label="${t("settings")}" data-act="modal-box">
+      <div class="modal-head">
+        <strong>${t("settings")}</strong>
+        <button class="iconbtn" data-act="close-settings" title="${t("close")}">×</button>
+      </div>
+      <p class="hint">${t("theme")}</p>
+      <div class="filters">
+        <button class="chip ${theme === "system" ? "on" : ""}" data-act="theme-set" data-theme="system">${t("themeSystem")}</button>
+        <button class="chip ${theme === "light" ? "on" : ""}" data-act="theme-set" data-theme="light">${t("themeLight")}</button>
+        <button class="chip ${theme === "dark" ? "on" : ""}" data-act="theme-set" data-theme="dark">${t("themeDark")}</button>
+      </div>
+      <p class="hint">${t("langLabel")}</p>
+      <button class="lang" data-act="lang" data-off="${enOn ? "0" : "1"}" ${enOn ? "" : "disabled"} title="${t("langOff")}">
+        <i data-icon="lang-pt" data-icon-size="16"></i><span>/</span><i data-icon="lang-en" data-icon-size="16"></i>
+      </button>
+      <p class="hint">${t("hyvorAccount")}</p>
+      ${profile}
+      <p class="hint">${t("repo")}</p>
+      <a class="chip" href="${REPO_URL}" target="_blank" rel="noopener">github.com/sergioSHKLR/lde-q</a>
+      <p class="hint">${t("version")}</p>
+      <p class="version">${APP_VERSION}</p>
+    </div>
+  </div>`;
+}
+  document.querySelectorAll("hyvor-talk-comments").forEach((el) => el.remove());
+}
+
 function destroyTalk() {
   document.querySelectorAll("hyvor-talk-comments").forEach((el) => el.remove());
 }
@@ -616,6 +695,8 @@ function mountTalk(n) {
   el.setAttribute("page-language", state.pref.locale === "en-US" ? "en-US" : "pt-BR");
   el.setAttribute("colors", document.documentElement.dataset.theme === "dark" ? "dark" : "light");
   host.appendChild(el);
+  setTimeout(readHyvorUser, 1200);
+  setTimeout(readHyvorUser, 4000);
 }
 
 function render() {
@@ -631,9 +712,10 @@ function render() {
   else if (r.name === "cap") html = paintCap(r.cap);
   else if (r.name === "sec") html = paintSec(r.sec);
   else html = paintHome();
-  root.innerHTML = html;
+  root.innerHTML = html + settingsModal();
   hydrateIcons(root);
   if (r.name === "q") mountTalk(r.n);
+  if (state.showSettings) readHyvorUser();
   if (r.name === "home" && state.focusSearch) {
     state.focusSearch = false;
     const el = document.querySelector("[data-act=search]");
@@ -669,10 +751,37 @@ function onClick(e) {
       render();
       return;
     }
-    if (a === "share") {
-      e.preventDefault();
+    if (a === "modal-box") {
       e.stopPropagation();
-      shareQuestion();
+      return;
+    }
+    if (a === "open-settings") {
+      e.preventDefault();
+      state.showSettings = true;
+      render();
+      return;
+    }
+    if (a === "close-settings") {
+      e.preventDefault();
+      state.showSettings = false;
+      render();
+      return;
+    }
+    if (a === "theme-set") {
+      e.preventDefault();
+      state.pref.theme = actEl.dataset.theme || "system";
+      savePref();
+      render();
+      return;
+    }
+    if (a === "hyvor-out") {
+      e.preventDefault();
+      try {
+        const el = document.querySelector("hyvor-talk-comments");
+        if (el && el.api && el.api.auth && el.api.auth.logout) el.api.auth.logout();
+      } catch {}
+      state.hyvorUser = null;
+      render();
       return;
     }
   }

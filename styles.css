@@ -412,3 +412,50 @@ button.row {
   z-index: 40;
   white-space: nowrap;
 }
+.modal-back {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.45);
+  z-index: 50;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding: 0 0 calc(4.6rem + env(safe-area-inset-bottom));
+}
+.modal {
+  width: min(28rem, 100%);
+  max-height: 80dvh;
+  overflow: auto;
+  background: var(--paper);
+  color: var(--ink);
+  border: 1px solid var(--line);
+  border-radius: 1rem 1rem .4rem .4rem;
+  padding: 1rem 1.1rem 1.3rem;
+}
+.modal-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-family: var(--sans);
+  margin-bottom: .4rem;
+}
+.hyvor-row {
+  display: flex;
+  align-items: center;
+  gap: .55rem;
+  flex-wrap: wrap;
+  text-align: left;
+}
+.hyvor-row small { display: block; color: var(--muted); }
+.avatar {
+  width: 2.2rem;
+  height: 2.2rem;
+  border-radius: 999px;
+  object-fit: cover;
+}
+.version {
+  font-family: var(--sans);
+  font-size: .82rem;
+  color: var(--muted);
+  margin: 0;
+}
