@@ -1,0 +1,28 @@
+name: decode-pwa-icons
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - "pwa/*.b64"
+      - ".github/workflows/decode-pwa-icons.yml"
+permissions:
+  contents: write
+jobs:
+  decode:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Decode base64 icons to PNG
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import base64
+          for p in sorted(Path("pwa").glob("*.png.b64")):
+              dest = Path(str(p)[:-4])
+              dest.write_bytes(base64.b64decode(p.read_text().strip()))
+              print(dest, dest.stat().st_size)
+          PY
+      - uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: Decode white PWA PNG icons
+          file_pattern: pwa/*.png
