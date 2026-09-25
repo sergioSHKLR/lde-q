@@ -4,19 +4,12 @@
     return localStorage.getItem(KEY) === "1";
   }
   function wrap(btn) {
-    if (btn.parentElement && btn.parentElement.classList.contains("settings-cluster")) return;
-    const wrapEl = document.createElement("span");
-    wrapEl.className = "settings-cluster";
-    if (btn.classList.contains("settings-corner")) {
-      wrapEl.classList.add("settings-corner");
-      btn.classList.remove("settings-corner");
-    }
+    if (btn.querySelector(".led")) return;
+    btn.classList.add("has-led");
     const led = document.createElement("span");
     led.className = "led";
     led.title = on() ? "Drive ligado" : "Drive desligado";
-    btn.parentNode.insertBefore(wrapEl, btn);
-    wrapEl.appendChild(led);
-    wrapEl.appendChild(btn);
+    btn.appendChild(led);
   }
   function paint() {
     document.querySelectorAll('[data-act="open-settings"]').forEach(wrap);

@@ -718,14 +718,13 @@ function topBar(extra = "") {
 }
 
 function tabBar(active) {
+  const setOn = state.showSettings ? "on" : "";
   return `<nav class="tabbar">
     <div class="tabs">
       <button data-go="#/" class="${active === "home" ? "on" : ""}"><i data-icon="sparkles"></i><span>${t("home")}</span></button>
       <button data-go="#/q/${state.lastQ || "1"}" class="${active === "q" ? "on" : ""}"><i data-icon="book"></i><span>${t("q")}</span></button>
       <button data-go="#/caderno" class="${active === "caderno" ? "on" : ""}"><i data-icon="sticky-note"></i><span>${t("notebook")}</span></button>
-    </div>
-    <div class="bar-end">
-      <button type="button" class="tab-set" data-act="open-settings" title="${t("settings")}" aria-label="${t("settings")}"><i data-icon="settings"></i></button>
+      <button type="button" class="${setOn}" data-act="open-settings" title="${t("settings")}" aria-label="${t("settings")}"><i data-icon="settings"></i><span>${t("settings")}</span></button>
     </div>
   </nav>`;
 }
