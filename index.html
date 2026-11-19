@@ -5,8 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <title>LDE-Q</title>
     <link rel="icon" href="brand/lde-favicon.svg" type="image/svg+xml" />
-    <link rel="apple-touch-icon" href="pwa/lde-192.png" />
-    <meta name="theme-color" content="#ffffff" />
+    <link rel="apple-touch-icon" href="pwa/lde-apple-touch-icon.png" />
+    <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#1a1a1a" media="(prefers-color-scheme: dark)" />
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-title" content="LDE-Q" />
@@ -16,12 +17,12 @@
     <meta property="og:title" content="LDE-Q" />
     <meta property="og:description" content="Anote · Comente · Compartilhe" />
     <meta property="og:url" content="https://lde.doutrina.org/" />
-    <meta property="og:image" content="https://lde.doutrina.org/pwa/lde-512.png" />
-    <meta property="og:image:width" content="512" />
-    <meta property="og:image:height" content="512" />
-    <meta name="twitter:card" content="summary" />
+    <meta property="og:image" content="https://lde.doutrina.org/og/lde-og.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="LDE-Q" />
-    <meta name="twitter:image" content="https://lde.doutrina.org/pwa/lde-512.png" />
+    <meta name="twitter:image" content="https://lde.doutrina.org/og/lde-x-card.png" />
     <script>
       (function () {
         var b = document.createElement("base");
@@ -29,9 +30,7 @@
         document.head.appendChild(b);
       })();
     </script>
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet" />
+    <link rel="preload" href="fonts/SHKLRMonoNarrow[wght].woff2" as="font" type="font/woff2" crossorigin />
     <link rel="stylesheet" href="styles.css?v=led16" />
     <link rel="stylesheet" href="led.css?v=led4" />
   </head>
