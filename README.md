@@ -1,4 +1,8 @@
-# lde-q
+# LDE-Q
+
+<img src="brand-kit/ldeq/icons/tile-light.svg" width="48" height="48" alt="LDE-Q">
+
+Live: https://lde.doutrina.org/ · Brand: [brand-kit/](brand-kit/README.md) (SHKLR brand kit, final 19 Nov 2026).
 
 Per-question reader for *O Livro dos Espíritos*.
 

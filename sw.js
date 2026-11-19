@@ -1,4 +1,4 @@
-const CACHE = "lde-q-v52";
+const CACHE = "lde-q-v53";
 const PRECACHE = [
   "./",
   "./index.html",
@@ -13,6 +13,9 @@ const PRECACHE = [
   "./brand/lde-favicon.svg",
   "./pwa/lde-192.png",
   "./pwa/lde-512.png",
+  "./favicon.ico",
+  "./pwa/lde-apple-touch-icon.png",
+  "./pwa/lde-apple-touch-icon-dark.png",
 ];
 
 self.addEventListener("install", (event) => {
